@@ -2,14 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
 class ShootBottomBarKindWidget extends StatefulWidget {
-  double width;
-  double height;
-  List<String> list;
-  int initialItem = 0;
-  ValueChanged<int> onSelected;
+  final double width;
+  final double height;
+  final List<String> list;
+  final int initialItem;
+  final ValueChanged<int> onSelected;
 
-  ShootBottomBarKindWidget(
-      {this.width, this.height, this.list, this.initialItem, this.onSelected});
+  const ShootBottomBarKindWidget(
+      {Key key,
+      this.width,
+      this.height,
+      this.list,
+      this.initialItem = 0,
+      this.onSelected})
+      : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
@@ -17,8 +23,7 @@ class ShootBottomBarKindWidget extends StatefulWidget {
   }
 }
 
-class _ShootBottomBarKindWidgetState
-    extends State<ShootBottomBarKindWidget> {
+class _ShootBottomBarKindWidgetState extends State<ShootBottomBarKindWidget> {
   FixedExtentScrollController _scrollController;
   int _selectedIndex = 0;
   double _selectedBgHeight;
@@ -42,10 +47,9 @@ class _ShootBottomBarKindWidgetState
           height: _selectedBgHeight,
           decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(_selectedBgHeight/2)
-          ),
+              borderRadius: BorderRadius.circular(_selectedBgHeight / 2)),
         ),
-        Container(
+        SizedBox(
           width: widget.width,
           height: widget.height,
           child: Center(
@@ -54,14 +58,14 @@ class _ShootBottomBarKindWidgetState
               child: NotificationListener(
                 child: ListWheelScrollView(
                   controller: _scrollController,
-                  physics: FixedExtentScrollPhysics(),
+                  physics: const FixedExtentScrollPhysics(),
                   diameterRatio: 100,
+                  itemExtent: widget.height,
                   children: List.generate(
                     widget.list.length,
-                        (index) => RotatedBox(
+                    (index) => RotatedBox(
                         quarterTurns: 1, child: _getItemLayout(index)),
                   ),
-                  itemExtent: widget.height,
                 ),
                 onNotification: (scroll) {
                   if (scroll is UserScrollNotification &&
@@ -82,25 +86,25 @@ class _ShootBottomBarKindWidgetState
   }
 
   _getItemLayout(int index) {
-    return  Container(
-        alignment: Alignment.center,
-        width: 50,
-        height: 50,
-        child:  Text(
-            widget.list[index],
-            style: TextStyle(
-              color: _selectedIndex == index ? Colors.black : Colors.white,
-              fontWeight: FontWeight.w500,
-              fontSize: 14,
-              shadows:<Shadow>[
-                Shadow(
-                  offset: Offset(0.5, 0.5),
-                  blurRadius: 0.5,
-                  color: Colors.grey,
-                ),
-              ],
+    return Container(
+      alignment: Alignment.center,
+      width: 50,
+      height: 50,
+      child: Text(
+        widget.list[index],
+        style: TextStyle(
+          color: _selectedIndex == index ? Colors.black : Colors.white,
+          fontWeight: FontWeight.w500,
+          fontSize: 14,
+          shadows: const <Shadow>[
+            Shadow(
+              offset: Offset(0.5, 0.5),
+              blurRadius: 0.5,
+              color: Colors.grey,
             ),
-          ),
+          ],
+        ),
+      ),
     );
   }
 }

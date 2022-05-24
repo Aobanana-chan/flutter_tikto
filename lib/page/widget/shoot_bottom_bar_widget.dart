@@ -2,14 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
 class ShootBottomBarWidget extends StatefulWidget {
-  double width;
-  double height;
-  List<String> list;
-  int initialItem = 0;
-  ValueChanged<int> onSelected;
+  final double width;
+  final double height;
+  final List<String> list;
+  final int initialItem;
+  final ValueChanged<int> onSelected;
 
-  ShootBottomBarWidget(
-      {this.width, this.height, this.list, this.initialItem, this.onSelected});
+  const ShootBottomBarWidget(
+      {Key key,
+      this.width,
+      this.height,
+      this.list,
+      this.initialItem = 0,
+      this.onSelected})
+      : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
@@ -17,8 +23,7 @@ class ShootBottomBarWidget extends StatefulWidget {
   }
 }
 
-class _ShootBottomBarWidgetState
-    extends State<ShootBottomBarWidget> {
+class _ShootBottomBarWidgetState extends State<ShootBottomBarWidget> {
   FixedExtentScrollController _scrollController;
   int _selectedIndex = 0;
 
@@ -36,36 +41,36 @@ class _ShootBottomBarWidgetState
       color: Colors.black,
       width: MediaQuery.of(context).size.width,
       alignment: Alignment.topCenter,
-      child:  Container(
+      child: Container(
         width: widget.width,
         height: widget.height,
         alignment: Alignment.topCenter,
-        child:  RotatedBox(
-            quarterTurns: -1,
-            child: NotificationListener(
-              child: ListWheelScrollView(
-                controller: _scrollController,
-                physics: FixedExtentScrollPhysics(),
-                diameterRatio: 100,
-                children: List.generate(
-                  widget.list.length,
-                      (index) => RotatedBox(
-                      quarterTurns: 1, child: _getItemLayout(index)),
-                ),
-                itemExtent: widget.height,
+        child: RotatedBox(
+          quarterTurns: -1,
+          child: NotificationListener(
+            child: ListWheelScrollView(
+              controller: _scrollController,
+              physics: const FixedExtentScrollPhysics(),
+              diameterRatio: 100,
+              itemExtent: widget.height,
+              children: List.generate(
+                widget.list.length,
+                (index) =>
+                    RotatedBox(quarterTurns: 1, child: _getItemLayout(index)),
               ),
-              onNotification: (scroll) {
-                if (scroll is UserScrollNotification &&
-                    scroll.direction == ScrollDirection.idle) {
-                  setState(() {
-                    _selectedIndex = _scrollController.selectedItem;
-                    widget.onSelected(_selectedIndex);
-                  });
-                }
-                return true;
-              },
             ),
+            onNotification: (scroll) {
+              if (scroll is UserScrollNotification &&
+                  scroll.direction == ScrollDirection.idle) {
+                setState(() {
+                  _selectedIndex = _scrollController.selectedItem;
+                  widget.onSelected(_selectedIndex);
+                });
+              }
+              return true;
+            },
           ),
+        ),
       ),
     );
   }
@@ -81,7 +86,6 @@ class _ShootBottomBarWidgetState
           color: _selectedIndex == index ? Colors.white : Colors.grey,
           fontWeight: FontWeight.w500,
           fontSize: 15,
-
         ),
       ),
     );

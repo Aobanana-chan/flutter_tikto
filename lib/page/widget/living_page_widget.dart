@@ -1,16 +1,14 @@
 import 'dart:ui';
 
-import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tiktok/page/widget/living_top_widget.dart';
 import 'package:flutter_tiktok/page/widget/living_info_widget.dart';
 import 'package:flutter_tiktok/page/widget/living_video_widget.dart';
 import 'package:flutter_tiktok/page/widget/living_bottom_widget.dart';
-import 'package:video_player/video_player.dart';
 
 class LivingPageWidget extends StatefulWidget {
-  Function onClosed;
-  LivingPageWidget({Key key,this.onClosed}) : super(key: key);
+  final Function onClosed;
+  const LivingPageWidget({Key key, this.onClosed}) : super(key: key);
 
   @override
   _LivingPageWidgetState createState() {
@@ -19,12 +17,8 @@ class LivingPageWidget extends StatefulWidget {
 }
 
 class _LivingPageWidgetState extends State<LivingPageWidget> {
-
-
-
   @override
   Widget build(BuildContext context) {
-
     return Container(
       constraints: BoxConstraints(
         maxWidth: MediaQuery.of(context).size.width,
@@ -39,29 +33,27 @@ class _LivingPageWidgetState extends State<LivingPageWidget> {
           Positioned(
             top: MediaQueryData.fromWindow(window).padding.top,
             child: LivingTopWidget(
-              onClosed: (){
+              onClosed: () {
                 widget.onClosed?.call();
               },
             ),
           ),
           Positioned(
-            top: MediaQueryData.fromWindow(window).padding.top + 60,
-              child: LivingInfoWidget()),
+              top: MediaQueryData.fromWindow(window).padding.top + 60,
+              child: const LivingInfoWidget()),
           Positioned(
-            top:  MediaQueryData.fromWindow(window).padding.top + 60 + 80,
-              child: LivingVideoWidget()),
-          Positioned(
-              bottom: 0,
-              child: LivingBottomWidget())
-
+              top: MediaQueryData.fromWindow(window).padding.top + 60 + 80,
+              child: const LivingVideoWidget()),
+          const Positioned(bottom: 0, child: LivingBottomWidget())
         ],
       ),
     );
   }
 
   _getBgImg() {
-    return Container(
-       child:  Image.asset('assets/images/blur_bg.jpg',fit: BoxFit.fill,),
+    return Image.asset(
+      'assets/images/blur_bg.jpg',
+      fit: BoxFit.fill,
     );
   }
 
@@ -74,5 +66,4 @@ class _LivingPageWidgetState extends State<LivingPageWidget> {
       ),
     );
   }
-
 }

@@ -2,14 +2,12 @@ import 'dart:collection';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_tiktok/model/request/follow_request.dart';
 import 'package:flutter_tiktok/model/request/publish_feed_request.dart';
 import 'package:flutter_tiktok/model/response/feed_list_response.dart';
 import 'package:flutter_tiktok/model/response/follow_response.dart';
 import 'package:flutter_tiktok/model/response/login_response.dart';
 import 'package:flutter_tiktok/model/response/publish_feed_response.dart';
-import 'package:flutter_tiktok/model/response/upload_response.dart';
 import 'package:flutter_tiktok/model/response/upload_token_response.dart';
 import 'package:flutter_tiktok/model/response/user_info_ex_response.dart';
 import 'package:flutter_tiktok/model/response/user_info_response.dart';
@@ -29,119 +27,150 @@ import 'package:flutter_tiktok/net/http_constant.dart';
 
 import '../model/comment_model.dart';
 
-class Api{
+class Api {
   /// ----------------------------------接口api--------------------------------------------------------
 
   ///登录
-  static Future<LoginResponse> login(String account,String pwd)async{
-
-    Map<String,String> map = HashMap();
+  @Deprecated("Old")
+  static Future<LoginResponse> login(String account, String pwd) async {
+    Map<String, String> map = HashMap();
     map['email'] = account;
     map['password'] = pwd;
-    var result = await HttpManager.getInstance().post(url: HttpConstant.login, cancelTokenTag: 'login',data: map);
+    var result = await HttpManager.getInstance()
+        .post(url: HttpConstant.login, cancelTokenTag: 'login', data: map);
     return LoginResponse().fromJson(result);
   }
 
   ///注册
-  static Future<LoginResponse> register(String account,String pwd,String pwdRepeat) async{
-    Map<String,String> map = HashMap();
+  static Future<LoginResponse> register(
+      String account, String pwd, String pwdRepeat) async {
+    Map<String, String> map = HashMap();
     map['email'] = account;
     map['password'] = pwd;
     map['repassword'] = pwdRepeat;
-    var result = await HttpManager.getInstance().post(url: HttpConstant.register, cancelTokenTag: 'register',data: map);
+    var result = await HttpManager.getInstance().post(
+        url: HttpConstant.register, cancelTokenTag: 'register', data: map);
     return LoginResponse().fromJson(result);
   }
 
   ///获取用户资料信息
-  static Future<UserInfoResponse> getUserInfo(String uid) async{
-    var result = await HttpManager.getInstance().get(url: HttpConstant.userInfo+uid, cancelTokenTag: 'getUserInfo',);
+  static Future<UserInfoResponse> getUserInfo(String uid) async {
+    var result = await HttpManager.getInstance().get(
+      url: HttpConstant.userInfo + uid,
+      cancelTokenTag: 'getUserInfo',
+    );
     return UserInfoResponse().fromJson(result);
   }
 
-
   ///获取用户资料信息(扩展)
-  static Future<UserInfoExResponse> getUserInfoEx(String uid) async{
-    var result = await HttpManager.getInstance().get(url: HttpConstant.userInfoEx+uid, cancelTokenTag: 'getUserInfoEx',);
+  static Future<UserInfoExResponse> getUserInfoEx(String uid) async {
+    var result = await HttpManager.getInstance().get(
+      url: HttpConstant.userInfoEx + uid,
+      cancelTokenTag: 'getUserInfoEx',
+    );
     return UserInfoExResponse().fromJson(result);
   }
 
   ///更新用户资料信息
-  static Future<UserInfoResponse> updateUserInfo(Map<String,dynamic> map) async{
-    var result = await HttpManager.getInstance().put(url: HttpConstant.userInfo+map['uid'].toString(), cancelTokenTag: 'getUserInfo',data: map);
+  static Future<UserInfoResponse> updateUserInfo(
+      Map<String, dynamic> map) async {
+    var result = await HttpManager.getInstance().put(
+        url: HttpConstant.userInfo + map['uid'].toString(),
+        cancelTokenTag: 'getUserInfo',
+        data: map);
     return UserInfoResponse().fromJson(result);
   }
 
   ///获取上传文件凭证
-  static Future<UploadTokenResponse> getSingleUploadToken(List<String> filePathList) async{
-    Map<String,List> map = HashMap();
+  static Future<UploadTokenResponse> getSingleUploadToken(
+      List<String> filePathList) async {
+    Map<String, List> map = HashMap();
     List resources = [];
-    for(int i=0;i<filePathList.length;i++){
-      Map<String,String> mapTemp = HashMap();
+    for (int i = 0; i < filePathList.length; i++) {
+      Map<String, String> mapTemp = HashMap();
       mapTemp['type'] = filePathList[i];
       resources.add(mapTemp);
     }
     map['resources'] = resources;
-    var result = await HttpManager.getInstance().post(url: HttpConstant.uploadToken, cancelTokenTag: "getUploadToken",data: map);
+    var result = await HttpManager.getInstance().post(
+        url: HttpConstant.uploadToken,
+        cancelTokenTag: "getUploadToken",
+        data: map);
     return UploadTokenResponse().fromJson(result);
   }
 
   ///上传文件
-  static Future<bool> uploadSingleFile(File file,UploadTokenResponse tokenResponse,String fileSuffix) async{
+  static Future<bool> uploadSingleFile(
+      File file, UploadTokenResponse tokenResponse, String fileSuffix) async {
     Stream<List<int>> listStream = file.openRead();
     UploadTokenTokensHeaders headers = tokenResponse.tokens[0].headers;
     UploadTokenToken tokenToken = tokenResponse.tokens[0];
     bool success = await HttpManager.getInstance().uploadFile(
-        url: tokenToken.uploadUrl,
-        cancelTokenTag: 'uploadFile',
-        data: listStream,
-        method: HttpMethod.PUT,
-        options: Options(
-          headers: {
-            'Content-Type':headers.contentType,
-            'Date':headers.date,
-            'Authorization':headers.authorization
-          }
-        ),
-
+      url: tokenToken.uploadUrl,
+      cancelTokenTag: 'uploadFile',
+      data: listStream,
+      method: HttpMethod.PUT,
+      options: Options(headers: {
+        'Content-Type': headers.contentType,
+        'Date': headers.date,
+        'Authorization': headers.authorization
+      }),
     );
     return success;
   }
 
   ///发布feed
-  static Future<PublishFeedResponse> publishFeed(PublishFeedRequest publishFeedRequest) async{
-    var result = await HttpManager.getInstance().post(url: HttpConstant.publishFeed, cancelTokenTag: 'publishFeed',data: publishFeedRequest.toJson());
+  static Future<PublishFeedResponse> publishFeed(
+      PublishFeedRequest publishFeedRequest) async {
+    var result = await HttpManager.getInstance().post(
+        url: HttpConstant.publishFeed,
+        cancelTokenTag: 'publishFeed',
+        data: publishFeedRequest.toJson());
     return PublishFeedResponse().fromJson(result);
   }
 
   ///获取用户作品列表
-  static Future<UserWorkListResponse> getUserFeedList(int uid,int cursor,int count)async{
-    var result = await HttpManager.getInstance().get(url: HttpConstant.userFeedList+'?uid=$uid&cursor=$cursor&count=$count', cancelTokenTag: 'getUserFeedList');
+  static Future<UserWorkListResponse> getUserFeedList(
+      int uid, int cursor, int count) async {
+    var result = await HttpManager.getInstance().get(
+        url:
+            '${HttpConstant.userFeedList}?uid=$uid&cursor=$cursor&count=$count',
+        cancelTokenTag: 'getUserFeedList');
     return UserWorkListResponse().fromJson(result);
   }
 
   ///获取热门作品列表
-  static Future<FeedListResponse> getHotFeedList(int cursor,int count) async{
-    var result = await HttpManager.getInstance().get(url: HttpConstant.hotFeedList+'?cursor=$cursor&count=$count', cancelTokenTag: 'getHotFeedList');
+  static Future<FeedListResponse> getHotFeedList(int cursor, int count) async {
+    var result = await HttpManager.getInstance().get(
+        url: '${HttpConstant.hotFeedList}?cursor=$cursor&count=$count',
+        cancelTokenTag: 'getHotFeedList');
     return FeedListResponse().fromJson(result);
   }
 
   ///获取好友作品列表
-  static Future<FeedListResponse> getFriendFeedList(int cursor,int count) async{
-    var result = await HttpManager.getInstance().get(url: HttpConstant.friendFeedList+'?cursor=$cursor&count=$count', cancelTokenTag: 'getFriendFeedList',);
+  static Future<FeedListResponse> getFriendFeedList(
+      int cursor, int count) async {
+    var result = await HttpManager.getInstance().get(
+      url: '${HttpConstant.friendFeedList}?cursor=$cursor&count=$count',
+      cancelTokenTag: 'getFriendFeedList',
+    );
     return FeedListResponse().fromJson(result);
   }
 
-  static Future<FollowResponse> follow(FollowRequest request) async{
-    var result = await HttpManager.getInstance().post(url: HttpConstant.follow, cancelTokenTag: 'follow',data: request.toJson());
+  static Future<FollowResponse> follow(FollowRequest request) async {
+    var result = await HttpManager.getInstance().post(
+        url: HttpConstant.follow,
+        cancelTokenTag: 'follow',
+        data: request.toJson());
     return FollowResponse().fromJson(result);
   }
 
   /// ----------------------------------本地数据--------------------------------------------------------
 
   //获取推荐页面的视频列表
-  static List<VideoModel> getRecommendVideoList(){
+  static List<VideoModel> getRecommendVideoList() {
     List<VideoModel> list = [];
-    for(int i = 0;i < 6;i ++){
+    for (int i = 0; i < 6; i++) {
       VideoModel videoModel = VideoModel();
       videoModel.title = videoTitleList[i];
       videoModel.author = authorList[i];
@@ -160,9 +189,9 @@ class Api{
   }
 
   //获取朋友页面的视频列表
-  static List<VideoModel> getFriendVideoList(){
+  static List<VideoModel> getFriendVideoList() {
     List<VideoModel> list = [];
-    for(int i = 0;i < 6;i ++){
+    for (int i = 0; i < 6; i++) {
       VideoModel videoModel = VideoModel();
       videoModel.title = videoTitleList[i];
       videoModel.author = authorList[i];
@@ -181,9 +210,9 @@ class Api{
   }
 
   //获取关注页面的视频列表
-  static List<VideoModel> getFocusVideoList(){
+  static List<VideoModel> getFocusVideoList() {
     List<VideoModel> list = [];
-    for(int i = 0;i < 6;i ++){
+    for (int i = 0; i < 6; i++) {
       VideoModel videoModel = VideoModel();
       videoModel.title = videoTitleList[i];
       videoModel.author = authorList[i];
@@ -202,9 +231,9 @@ class Api{
   }
 
   //获取城市页面的视频列表
-  static List<CityItemModel> getCityVideoList(){
+  static List<CityItemModel> getCityVideoList() {
     List<CityItemModel> list = [];
-    for(int i = 0;i < 6;i ++){
+    for (int i = 0; i < 6; i++) {
       CityItemModel cityItemModel = CityItemModel();
       cityItemModel.user = userModelList[i];
       cityItemModel.imgCoverUrl = gifList[i];
@@ -213,14 +242,7 @@ class Api{
     }
     return list;
   }
-
-
-
 }
-
-
-
-
 
 List<UserModel> userModelList = List.generate(6, (i) {
   UserModel userModel = UserModel();
@@ -229,7 +251,7 @@ List<UserModel> userModelList = List.generate(6, (i) {
   userModel.headerImg = authorHeaderUrlList[i];
   userModel.douYinNumber = '19234$i';
   userModel.introduction = introductionList[i];
-  userModel.male = i%2 == 0?true:false;
+  userModel.male = i % 2 == 0 ? true : false;
   userModel.city = '杭州';
   userModel.likeTotalNumber = '156${i}w';
   userModel.focusNumber = '45${i}w';
@@ -258,23 +280,22 @@ List<UserModel> userModelList = List.generate(6, (i) {
 });
 
 UserModel loginUserModel = UserModel(
-  name: '钉某人',
-  loginUser: true,
-  headerBgImage: 'assets/images/bg_1.jpg',
-  headerImg: 'assets/images/header_holder.jpg',
-  douYinNumber: '19423900',
-  introduction: 'Flutter小战士\nGithub:https://github.com/DingMouRen\n简书:https://www.jianshu.com/u/4abd568623a2\nB站:搜索[码农钉某人]',
-  male: true,
-  city: '杭州',
-  likeTotalNumber: '66w',
-  focusNumber: '66w',
-  fansNumber: '888',
-  worksVideo: videoModelList,
-  likeVideo: videoModelList,
-  likeVideoGif: gifList,
-  worksVideoGif: gifList
-
-);
+    name: '钉某人',
+    loginUser: true,
+    headerBgImage: 'assets/images/bg_1.jpg',
+    headerImg: 'assets/images/header_holder.jpg',
+    douYinNumber: '19423900',
+    introduction:
+        'Flutter小战士\nGithub:https://github.com/DingMouRen\n简书:https://www.jianshu.com/u/4abd568623a2\nB站:搜索[码农钉某人]',
+    male: true,
+    city: '杭州',
+    likeTotalNumber: '66w',
+    focusNumber: '66w',
+    fansNumber: '888',
+    worksVideo: videoModelList,
+    likeVideo: videoModelList,
+    likeVideoGif: gifList,
+    worksVideoGif: gifList);
 
 List<VideoModel> videoModelList = List.generate(6, (i) {
   VideoModel videoModel = VideoModel();
@@ -292,30 +313,45 @@ List<VideoModel> videoModelList = List.generate(6, (i) {
   return videoModel;
 });
 
-
 //评论的本地假数据
 List<CommentModel> commentList = [
-  CommentModel('爱丽丝',  'assets/images/header_0.jpg','千秋无绝色！悦目是佳人！倾国倾城貌！惊为天下人！', false, 234, '2分钟前'),
-  CommentModel('一条小团团',  'assets/images/header_1.jpg','芙蓉不及美人妆，水殿风来珠翠香', false, 688, '9分钟前'),
-  CommentModel('伊素婉',  'assets/images/header_2.jpg', '届笑春桃兮，云堆翠髻；唇绽樱颗兮，榴齿含香',false, 7567, '6分钟前'),
-  CommentModel('超级马里奥',  'assets/images/header_3.jpg','朱粉不深匀,闲花淡淡香。细看诸处好,人人道,柳腰身', false, 3543, '23分钟前'),
-  CommentModel('肖了个邦',  'assets/images/header_4.jpg', '头上金爵钗，腰佩翠琅玕。明珠交玉体，珊瑚间木难。罗衣何飘飘，轻裾随风远。顾盼遗光彩，长啸气若兰',false, 234, '4小时前'),
-  CommentModel('惠子',  'assets/images/header_5.jpg', '皎皎兮似轻云之蔽月，飘飘兮若回风之流雪',false, 888, '4分钟前'),
-  CommentModel('爱丽丝',  'assets/images/header_0.jpg','千秋无绝色！悦目是佳人！倾国倾城貌！惊为天下人！', false, 234, '2分钟前'),
-  CommentModel('一条小团团',  'assets/images/header_1.jpg','芙蓉不及美人妆，水殿风来珠翠香', false, 688, '9分钟前'),
-  CommentModel('伊素婉',  'assets/images/header_2.jpg', '届笑春桃兮，云堆翠髻；唇绽樱颗兮，榴齿含香',false, 7567, '6分钟前'),
-  CommentModel('超级马里奥',  'assets/images/header_3.jpg','朱粉不深匀,闲花淡淡香。细看诸处好,人人道,柳腰身', false, 3543, '23分钟前'),
-  CommentModel('肖了个邦',  'assets/images/header_4.jpg', '头上金爵钗，腰佩翠琅玕。明珠交玉体，珊瑚间木难。罗衣何飘飘，轻裾随风远。顾盼遗光彩，长啸气若兰',false, 234, '4小时前'),
-  CommentModel('惠子',  'assets/images/header_5.jpg', '皎皎兮似轻云之蔽月，飘飘兮若回风之流雪',false, 888, '4分钟前'),
-  CommentModel('爱丽丝',  'assets/images/header_0.jpg','千秋无绝色！悦目是佳人！倾国倾城貌！惊为天下人！', false, 234, '2分钟前'),
-  CommentModel('一条小团团',  'assets/images/header_1.jpg','芙蓉不及美人妆，水殿风来珠翠香', false, 688, '9分钟前'),
-  CommentModel('伊素婉',  'assets/images/header_2.jpg', '届笑春桃兮，云堆翠髻；唇绽樱颗兮，榴齿含香',false, 7567, '6分钟前'),
-  CommentModel('超级马里奥',  'assets/images/header_3.jpg','朱粉不深匀,闲花淡淡香。细看诸处好,人人道,柳腰身', false, 3543, '23分钟前'),
-  CommentModel('肖了个邦',  'assets/images/header_4.jpg', '头上金爵钗，腰佩翠琅玕。明珠交玉体，珊瑚间木难。罗衣何飘飘，轻裾随风远。顾盼遗光彩，长啸气若兰',false, 234, '4小时前'),
-  CommentModel('惠子',  'assets/images/header_5.jpg', '皎皎兮似轻云之蔽月，飘飘兮若回风之流雪',false, 888, '4分钟前'),
+  CommentModel('爱丽丝', 'assets/images/header_0.jpg', '千秋无绝色！悦目是佳人！倾国倾城貌！惊为天下人！',
+      false, 234, '2分钟前'),
+  CommentModel('一条小团团', 'assets/images/header_1.jpg', '芙蓉不及美人妆，水殿风来珠翠香', false,
+      688, '9分钟前'),
+  CommentModel('伊素婉', 'assets/images/header_2.jpg', '届笑春桃兮，云堆翠髻；唇绽樱颗兮，榴齿含香',
+      false, 7567, '6分钟前'),
+  CommentModel('超级马里奥', 'assets/images/header_3.jpg',
+      '朱粉不深匀,闲花淡淡香。细看诸处好,人人道,柳腰身', false, 3543, '23分钟前'),
+  CommentModel('肖了个邦', 'assets/images/header_4.jpg',
+      '头上金爵钗，腰佩翠琅玕。明珠交玉体，珊瑚间木难。罗衣何飘飘，轻裾随风远。顾盼遗光彩，长啸气若兰', false, 234, '4小时前'),
+  CommentModel('惠子', 'assets/images/header_5.jpg', '皎皎兮似轻云之蔽月，飘飘兮若回风之流雪', false,
+      888, '4分钟前'),
+  CommentModel('爱丽丝', 'assets/images/header_0.jpg', '千秋无绝色！悦目是佳人！倾国倾城貌！惊为天下人！',
+      false, 234, '2分钟前'),
+  CommentModel('一条小团团', 'assets/images/header_1.jpg', '芙蓉不及美人妆，水殿风来珠翠香', false,
+      688, '9分钟前'),
+  CommentModel('伊素婉', 'assets/images/header_2.jpg', '届笑春桃兮，云堆翠髻；唇绽樱颗兮，榴齿含香',
+      false, 7567, '6分钟前'),
+  CommentModel('超级马里奥', 'assets/images/header_3.jpg',
+      '朱粉不深匀,闲花淡淡香。细看诸处好,人人道,柳腰身', false, 3543, '23分钟前'),
+  CommentModel('肖了个邦', 'assets/images/header_4.jpg',
+      '头上金爵钗，腰佩翠琅玕。明珠交玉体，珊瑚间木难。罗衣何飘飘，轻裾随风远。顾盼遗光彩，长啸气若兰', false, 234, '4小时前'),
+  CommentModel('惠子', 'assets/images/header_5.jpg', '皎皎兮似轻云之蔽月，飘飘兮若回风之流雪', false,
+      888, '4分钟前'),
+  CommentModel('爱丽丝', 'assets/images/header_0.jpg', '千秋无绝色！悦目是佳人！倾国倾城貌！惊为天下人！',
+      false, 234, '2分钟前'),
+  CommentModel('一条小团团', 'assets/images/header_1.jpg', '芙蓉不及美人妆，水殿风来珠翠香', false,
+      688, '9分钟前'),
+  CommentModel('伊素婉', 'assets/images/header_2.jpg', '届笑春桃兮，云堆翠髻；唇绽樱颗兮，榴齿含香',
+      false, 7567, '6分钟前'),
+  CommentModel('超级马里奥', 'assets/images/header_3.jpg',
+      '朱粉不深匀,闲花淡淡香。细看诸处好,人人道,柳腰身', false, 3543, '23分钟前'),
+  CommentModel('肖了个邦', 'assets/images/header_4.jpg',
+      '头上金爵钗，腰佩翠琅玕。明珠交玉体，珊瑚间木难。罗衣何飘飘，轻裾随风远。顾盼遗光彩，长啸气若兰', false, 234, '4小时前'),
+  CommentModel('惠子', 'assets/images/header_5.jpg', '皎皎兮似轻云之蔽月，飘飘兮若回风之流雪', false,
+      888, '4分钟前'),
 ];
-
-
 
 //视频本地标题
 List<String> videoTitleList = [
@@ -409,9 +445,9 @@ List<String> introductionList = [
 //消息列表
 List<MessageModel> messageList = List.generate(20, (index) {
   MessageModel model = MessageModel();
-  model.imgUrl = videoMusicImageList[index%6];
-  model.title = authorList[index%6];
-  model.desc = index%2 == 0?'一条小团团赞了你的作品 · 6:12':'[发布了新作品] · 06-06';
+  model.imgUrl = videoMusicImageList[index % 6];
+  model.title = authorList[index % 6];
+  model.desc = index % 2 == 0 ? '一条小团团赞了你的作品 · 6:12' : '[发布了新作品] · 06-06';
   return model;
 });
 //明星列表
@@ -454,10 +490,10 @@ List<BrandRankModel> brandList = [
 
 //直播页评论
 List<LivingCommendModel> livingCommendList = [
-  LivingCommendModel('小冰人','cool'),
-  LivingCommendModel('张靓颖','好帅呀,cool'),
-  LivingCommendModel('Jack','主播牛逼呀，厉害呢'),
-  LivingCommendModel('一朵花花','主播牛逼呀，厉害呢'),
-  LivingCommendModel('小红','好帅呀，俺要嫁给你，么么哒~~~'),
-  LivingCommendModel('小黄人','好帅呀，左手一只鸭，右手一只鸡，啊啊'),
+  LivingCommendModel('小冰人', 'cool'),
+  LivingCommendModel('张靓颖', '好帅呀,cool'),
+  LivingCommendModel('Jack', '主播牛逼呀，厉害呢'),
+  LivingCommendModel('一朵花花', '主播牛逼呀，厉害呢'),
+  LivingCommendModel('小红', '好帅呀，俺要嫁给你，么么哒~~~'),
+  LivingCommendModel('小黄人', '好帅呀，左手一只鸭，右手一只鸡，啊啊'),
 ];

@@ -6,7 +6,7 @@ import 'package:flutter_tiktok/res/colors.dart';
 import 'package:get/get.dart';
 
 class UserWorkListWidget extends StatefulWidget {
-  UserWorkListWidget({Key key}) : super(key: key);
+  const UserWorkListWidget({Key key}) : super(key: key);
 
   @override
   _UserWorkListWidgetState createState() {
@@ -15,7 +15,7 @@ class UserWorkListWidget extends StatefulWidget {
 }
 
 class _UserWorkListWidgetState extends State<UserWorkListWidget> {
-  UserController _userController = Get.find();
+  final UserController _userController = Get.find();
   @override
   void initState() {
     super.initState();
@@ -36,34 +36,32 @@ class _UserWorkListWidgetState extends State<UserWorkListWidget> {
 
   _getBody(BuildContext context) {
     List<UserWorkListList> workList = _userController.userWorkList.value;
-    if(null == workList || workList.length == 0){
+    if (null == workList || workList.isEmpty) {
       return Container();
-    }else{
-      return Container(
-        child: GridView.builder(
-          //处理GridView顶部空白
-          padding: EdgeInsets.zero,
-          itemCount: workList.length,
-          physics: NeverScrollableScrollPhysics(),
-          shrinkWrap: true,
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+    } else {
+      return GridView.builder(
+        //处理GridView顶部空白
+        padding: EdgeInsets.zero,
+        itemCount: workList.length,
+        physics: const NeverScrollableScrollPhysics(),
+        shrinkWrap: true,
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             //横轴元素个数
-              crossAxisCount: 3,
-              //纵轴间距
-              mainAxisSpacing: 1,
-              //横轴间距
-              crossAxisSpacing: 1,
-              //子组件宽高长度比例
-              childAspectRatio: 9/16),
-          itemBuilder: (BuildContext context, int index) {
-            return UserItemGridWidget(
-              url: workList[index].content.attachments[0].cover,
-              onTap: (){
-                // Navigator.push(context, MaterialPageRoute(builder: (context) => VideoListPage(videoList: _userModel.worksVideo,)));
-              },
-            );
-          },
-        ),
+            crossAxisCount: 3,
+            //纵轴间距
+            mainAxisSpacing: 1,
+            //横轴间距
+            crossAxisSpacing: 1,
+            //子组件宽高长度比例
+            childAspectRatio: 9 / 16),
+        itemBuilder: (BuildContext context, int index) {
+          return UserItemGridWidget(
+            gifUrl: workList[index].content.attachments[0].cover,
+            onTap: () {
+              // Navigator.push(context, MaterialPageRoute(builder: (context) => VideoListPage(videoList: _userModel.worksVideo,)));
+            },
+          );
+        },
       );
     }
   }

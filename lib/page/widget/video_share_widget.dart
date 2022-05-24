@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class VideoShareWidget extends StatefulWidget {
-  VideoShareWidget({Key key}) : super(key: key);
+  const VideoShareWidget({Key key}) : super(key: key);
 
   @override
   _VideoShareWidgetState createState() {
@@ -73,17 +73,24 @@ class _VideoShareWidgetState extends State<VideoShareWidget> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      constraints: BoxConstraints(
+      constraints: const BoxConstraints(
         minHeight: 90, //设置最小高度（必要）
         maxHeight: 300, //设置最大高度（必要）
       ),
       child: Column(
         children: [
           _getTitleLayout(),
-          SizedBox(height: 20,),
+          const SizedBox(
+            height: 20,
+          ),
           _getFriendsLayout(),
-          Divider(height: 0.5,color: Colors.grey,),
-          SizedBox(height: 9,),
+          const Divider(
+            height: 0.5,
+            color: Colors.grey,
+          ),
+          const SizedBox(
+            height: 9,
+          ),
           _getAppsLayout(),
           _getActionsLayout(),
         ],
@@ -92,107 +99,127 @@ class _VideoShareWidgetState extends State<VideoShareWidget> {
   }
 
   _getTitleLayout() {
-    return Container(
+    return SizedBox(
       height: 30,
       child: Stack(
-        alignment:Alignment.center,
+        alignment: Alignment.center,
         children: [
-          Positioned(
+          const Positioned(
             left: 16,
             bottom: 0,
-            child: Text('私信给朋友',style: TextStyle(fontWeight: FontWeight.bold,color: Colors.white,fontSize: 14),),
+            child: Text(
+              '私信给朋友',
+              style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  fontSize: 14),
+            ),
           ),
           Positioned(
               right: 16,
               bottom: 0,
               child: InkWell(
-                  onTap: (){
+                  onTap: () {
                     Get.back();
                   },
-                  child: Image.asset('assets/images/bg_cross.webp',width: 25,height: 25,))),
+                  child: Image.asset(
+                    'assets/images/bg_cross.webp',
+                    width: 25,
+                    height: 25,
+                  ))),
         ],
       ),
     );
   }
 
   _getFriendsLayout() {
-    return Container(
+    return SizedBox(
       height: 80,
       child: SingleChildScrollView(
-        scrollDirection:Axis.horizontal,
+        scrollDirection: Axis.horizontal,
         child: Row(
           children: List.generate(18, (index) {
             return Container(
-              margin: EdgeInsets.only(left: 20),
+              margin: const EdgeInsets.only(left: 20),
               child: Column(
                 children: [
                   CircleAvatar(
                       radius: 24,
-                      backgroundImage:AssetImage('assets/images/header_${index%6}.jpg')
+                      backgroundImage:
+                          AssetImage('assets/images/header_${index % 6}.jpg')),
+                  const SizedBox(
+                    height: 5,
                   ),
-                  SizedBox(height: 5,),
-                  Text(nameList[index%6],style: TextStyle(color: Colors.white,fontSize: 10),)
+                  Text(
+                    nameList[index % 6],
+                    style: const TextStyle(color: Colors.white, fontSize: 10),
+                  )
                 ],
               ),
             );
-          }
-          ),
+          }),
         ),
       ),
     );
   }
 
   _getAppsLayout() {
-    return Container(
-      height: 80,
-     child: SingleChildScrollView(
-       scrollDirection: Axis.horizontal,
-       child: Row(
-         children: List.generate(9, (index) {
-           return Container(
-             margin: EdgeInsets.only(left: 20),
-             child: Column(
-               children: [
-                 CircleAvatar(
-                     backgroundColor:Colors.transparent,
-                     radius: 24,
-                     backgroundImage:AssetImage(imgApps[index])
-                 ),
-                 SizedBox(height: 5,),
-                 Text(nameApps[index],style: TextStyle(color: Colors.white,fontSize: 10),)
-               ],
-             ),
-           );
-         }
-         ),
-       ),
-     ),
-    );
-  }
-
-  _getActionsLayout() {
-    return Container(
+    return SizedBox(
       height: 80,
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Row(
           children: List.generate(9, (index) {
             return Container(
-              margin: EdgeInsets.only(left: 20),
+              margin: const EdgeInsets.only(left: 20),
               child: Column(
                 children: [
                   CircleAvatar(
-                      backgroundColor:Colors.transparent,
+                      backgroundColor: Colors.transparent,
                       radius: 24,
-                      backgroundImage:AssetImage(imgActions[index])
+                      backgroundImage: AssetImage(imgApps[index])),
+                  const SizedBox(
+                    height: 5,
                   ),
-                  SizedBox(height: 5,),
-                  Text(nameActions[index],style: TextStyle(color: Colors.white,fontSize: 10),)
+                  Text(
+                    nameApps[index],
+                    style: const TextStyle(color: Colors.white, fontSize: 10),
+                  )
                 ],
               ),
             );
-          }
-          ),
+          }),
+        ),
+      ),
+    );
+  }
+
+  _getActionsLayout() {
+    return SizedBox(
+      height: 80,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: List.generate(9, (index) {
+            return Container(
+              margin: const EdgeInsets.only(left: 20),
+              child: Column(
+                children: [
+                  CircleAvatar(
+                      backgroundColor: Colors.transparent,
+                      radius: 24,
+                      backgroundImage: AssetImage(imgActions[index])),
+                  const SizedBox(
+                    height: 5,
+                  ),
+                  Text(
+                    nameActions[index],
+                    style: const TextStyle(color: Colors.white, fontSize: 10),
+                  )
+                ],
+              ),
+            );
+          }),
         ),
       ),
     );

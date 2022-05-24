@@ -1,10 +1,8 @@
-
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_tiktok/common/router_manager.dart';
-import 'package:flutter_tiktok/res/colors.dart';
 import 'package:get/get.dart';
 import 'package:oktoast/oktoast.dart';
-import 'package:video_player/video_player.dart';
 
 void main() {
   runApp(OKToast(
@@ -14,9 +12,7 @@ void main() {
       defaultTransition: Transition.rightToLeft,
       getPages: RouterManager.routes,
       initialRoute: Routers.scroll,
+      builder: EasyLoading.init(),
     ),
   ));
 }
-
-
-

@@ -3,13 +3,13 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_tiktok/model/video_model.dart';
-import 'package:flutter_tiktok/page/widget/video_widget.dart';
 import 'package:flutter_tiktok/res/colors.dart';
 import 'package:get/get.dart';
+
 ///视频列表页
 class VideoListPage extends StatefulWidget {
-  List<VideoModel> videoList;
-  VideoListPage({Key key,this.videoList}) : super(key: key);
+  final List<VideoModel> videoList;
+  const VideoListPage({Key key, this.videoList}) : super(key: key);
 
   @override
   _VideoListPageState createState() {
@@ -18,12 +18,11 @@ class VideoListPage extends StatefulWidget {
 }
 
 class _VideoListPageState extends State<VideoListPage> {
-  PageController _pageController = PageController(keepPage: true);
+  final PageController _pageController = PageController(keepPage: true);
 
   @override
   void initState() {
     super.initState();
-
   }
 
   @override
@@ -32,16 +31,15 @@ class _VideoListPageState extends State<VideoListPage> {
     _pageController.dispose();
   }
 
-
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-      statusBarColor:Colors.black,
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+      statusBarColor: Colors.black,
       statusBarIconBrightness: Brightness.dark,
     ));
     return Scaffold(
       backgroundColor: Colors.black,
-      body: Container(
+      body: SizedBox(
         height: MediaQuery.of(context).size.height,
         child: Stack(
           children: [
@@ -58,59 +56,66 @@ class _VideoListPageState extends State<VideoListPage> {
     return Container(
       height: 40,
       constraints: BoxConstraints(
-        maxWidth: MediaQuery.of(context).size.width,
-        maxHeight: 40,
-        minHeight: 40
-      ),
-      margin: EdgeInsets.only(top: MediaQueryData.fromWindow(window).padding.top),
+          maxWidth: MediaQuery.of(context).size.width,
+          maxHeight: 40,
+          minHeight: 40),
+      margin:
+          EdgeInsets.only(top: MediaQueryData.fromWindow(window).padding.top),
       child: Stack(
         alignment: Alignment.center,
         children: [
           Positioned(
-          left: 0,
-          child: IconButton(
-              icon: Icon(Icons.arrow_back_ios_rounded,color: Colors.white,),
-              onPressed: (){
+            left: 0,
+            child: IconButton(
+              icon: const Icon(
+                Icons.arrow_back_ios_rounded,
+                color: Colors.white,
+              ),
+              onPressed: () {
                 Get.back();
               },
+            ),
           ),
-          ),
-
           Positioned(
-            right: 0,
+              right: 0,
               child: IconButton(
-                icon: Icon(Icons.search_rounded,color: Colors.white,),
-              )
-          )
+                icon: const Icon(
+                  Icons.search_rounded,
+                  color: Colors.white,
+                ),
+                onPressed: () {},
+              ))
         ],
       ),
     );
   }
 
   _getVideoPageView() {
-    double contentHeight = MediaQuery.of(context).size.height - 48 - MediaQueryData.fromWindow(window).padding.top;
-    return  Container(
-          constraints: BoxConstraints(
-            maxWidth: MediaQuery.of(context).size.width,
-            maxHeight: contentHeight,
-          ),
-        margin: EdgeInsets.only(top: MediaQueryData.fromWindow(window).padding.top),
-          child: PageView.builder(
-            controller: _pageController,
-            itemCount: widget.videoList.length,
-            scrollDirection: Axis.vertical,
-            itemBuilder: (context, index) {
-              return Container();
-              // return VideoWidget(
-              //   videoModel: widget.videoList[index],
-              //   showFocusButton: false,
-              //   onClickHeader: (){
-              //
-              //   },
-              // );
-            },
-            onPageChanged: (index){
-            },
+    double contentHeight = MediaQuery.of(context).size.height -
+        48 -
+        MediaQueryData.fromWindow(window).padding.top;
+    return Container(
+        constraints: BoxConstraints(
+          maxWidth: MediaQuery.of(context).size.width,
+          maxHeight: contentHeight,
+        ),
+        margin:
+            EdgeInsets.only(top: MediaQueryData.fromWindow(window).padding.top),
+        child: PageView.builder(
+          controller: _pageController,
+          itemCount: widget.videoList.length,
+          scrollDirection: Axis.vertical,
+          itemBuilder: (context, index) {
+            return Container();
+            // return VideoWidget(
+            //   videoModel: widget.videoList[index],
+            //   showFocusButton: false,
+            //   onClickHeader: (){
+            //
+            //   },
+            // );
+          },
+          onPageChanged: (index) {},
         ));
   }
 
@@ -120,26 +125,35 @@ class _VideoListPageState extends State<VideoListPage> {
       child: Container(
         height: 48,
         width: MediaQuery.of(context).size.width,
-        margin: EdgeInsets.only(left: 16,right: 16),
+        margin: const EdgeInsets.only(left: 16, right: 16),
         child: Stack(
           alignment: Alignment.centerLeft,
           children: [
-            Text("留下你的精彩评论吧",style: TextStyle(color: ColorRes.color_2,fontSize: 14),),
+            const Text(
+              "留下你的精彩评论吧",
+              style: TextStyle(color: ColorRes.color_2, fontSize: 14),
+            ),
             Positioned(
               right: 65,
-                child: Image.asset('assets/images/at.webp',color:  ColorRes.color_2,width: 28,height: 28,),
+              child: Image.asset(
+                'assets/images/at.webp',
+                color: ColorRes.color_2,
+                width: 28,
+                height: 28,
+              ),
             ),
             Positioned(
               right: 16,
-              child: Image.asset('assets/images/smile.webp',color:  ColorRes.color_2,width: 45,height: 45,),
+              child: Image.asset(
+                'assets/images/smile.webp',
+                color: ColorRes.color_2,
+                width: 45,
+                height: 45,
+              ),
             )
           ],
         ),
       ),
     );
   }
-
-
-
-
 }

@@ -3,12 +3,10 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 
 class UserItemGridWidget extends StatefulWidget {
-  String gifUrl;
-  Function onTap;
-  UserItemGridWidget({String url,Function onTap}){
-    this.gifUrl = url;
-    this.onTap = onTap;
-  }
+  final String gifUrl;
+  final Function onTap;
+  const UserItemGridWidget({Key key, this.gifUrl, this.onTap})
+      : super(key: key);
   @override
   _UserItemGridWidgetState createState() {
     return _UserItemGridWidgetState();
@@ -16,32 +14,36 @@ class UserItemGridWidget extends StatefulWidget {
 }
 
 class _UserItemGridWidgetState extends State<UserItemGridWidget> {
-
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: (){
+      onTap: () {
         widget.onTap?.call();
       },
       child: Stack(
-          children: [
-            Image.network(widget.gifUrl,fit: BoxFit.cover,),
-            Positioned(
-              left: 2,
-              bottom: 2,
-              child: Row(
-                children: [
-                  Image.asset('assets/images/hollow_heart.webp',width: 15,height: 15,),
-                  Text(' ${Random().nextInt(600)}',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 12
-                    ),
-                  ),
-                ],
-              ),
+        children: [
+          Image.network(
+            widget.gifUrl,
+            fit: BoxFit.cover,
+          ),
+          Positioned(
+            left: 2,
+            bottom: 2,
+            child: Row(
+              children: [
+                Image.asset(
+                  'assets/images/hollow_heart.webp',
+                  width: 15,
+                  height: 15,
+                ),
+                Text(
+                  ' ${Random().nextInt(600)}',
+                  style: const TextStyle(color: Colors.white, fontSize: 12),
+                ),
+              ],
             ),
-          ],
+          ),
+        ],
       ),
     );
   }

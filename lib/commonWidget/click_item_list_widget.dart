@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 class ClickItemListWidget extends StatefulWidget {
   final List actionTitles;
   final Function(int position) onClick;
-  ClickItemListWidget({Key key,this.actionTitles,this.onClick});
+  // ignore: use_key_in_widget_constructors
+  const ClickItemListWidget({Key key, this.actionTitles, this.onClick});
 
   @override
   _ClickItemListWidgetState createState() {
@@ -24,30 +25,35 @@ class _ClickItemListWidgetState extends State<ClickItemListWidget> {
 
   @override
   Widget build(BuildContext context) {
-    
     return ListView.builder(
-      shrinkWrap: true,
+        shrinkWrap: true,
         itemCount: widget.actionTitles.length,
-        itemBuilder: (context,position){
-          return _getItem(context,position);
+        itemBuilder: (context, position) {
+          return _getItem(context, position);
         });
   }
 
   Widget _getItem(BuildContext context, int position) {
     return InkWell(
-      onTap: (){
+      onTap: () {
         widget.onClick.call(position);
       },
-      child: Container(
+      child: SizedBox(
         height: 60,
         child: Column(
           children: [
             Container(
               height: 59,
               alignment: Alignment.center,
-              child: Text(widget.actionTitles[position],style: TextStyle(fontSize: 16),),
+              child: Text(
+                widget.actionTitles[position],
+                style: const TextStyle(fontSize: 16),
+              ),
             ),
-            Divider(height: 0.5,color: Colors.black.withAlpha(60),)
+            Divider(
+              height: 0.5,
+              color: Colors.black.withAlpha(60),
+            )
           ],
         ),
       ),

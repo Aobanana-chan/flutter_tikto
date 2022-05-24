@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_tiktok/common/application.dart';
 import 'package:flutter_tiktok/commonWidget/edit_clear_widget.dart';
-import 'package:flutter_tiktok/controller/user_controller.dart';
-import 'package:flutter_tiktok/enum/type_userinfo_edit.dart';
 import 'package:flutter_tiktok/event/modify_info_event.dart';
 import 'package:flutter_tiktok/res/colors.dart';
 import 'package:get/get.dart';
+
 ///修改用户资料的通用组件
 class ModifyInfoPage extends StatefulWidget {
-
-  ModifyInfoPage({Key key}) : super(key: key);
+  const ModifyInfoPage({Key key}) : super(key: key);
 
   @override
   _ModifyInfoPageState createState() {
@@ -25,7 +23,7 @@ class _ModifyInfoPageState extends State<ModifyInfoPage> {
   @override
   void initState() {
     super.initState();
-    Map<String,String> parameters = Get.parameters;
+    Map<String, String> parameters = Get.parameters;
     title = parameters['title'];
     content = parameters['content'];
     typeEdit = int.parse(parameters['type_edit']);
@@ -38,7 +36,6 @@ class _ModifyInfoPageState extends State<ModifyInfoPage> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       backgroundColor: ColorRes.color_1,
       appBar: AppBar(
@@ -47,11 +44,18 @@ class _ModifyInfoPageState extends State<ModifyInfoPage> {
         centerTitle: true,
         actions: [
           TextButton(
-          onPressed: (){
-            Application.eventBus.fire(ModifyInfoEvent(typeEdit, contentNew));
-            Get.back();
-          },
-          child: Text('保存',style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold,color: ColorRes.color_3),))
+              onPressed: () {
+                Application.eventBus
+                    .fire(ModifyInfoEvent(typeEdit, contentNew));
+                Get.back();
+              },
+              child: const Text(
+                '保存',
+                style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: ColorRes.color_3),
+              ))
         ],
       ),
       body: _getBody(content),
@@ -61,7 +65,7 @@ class _ModifyInfoPageState extends State<ModifyInfoPage> {
   _getBody(String content) {
     return EditClearWidget(
       contentOriginal: content,
-      onChange: (text){
+      onChange: (text) {
         contentNew = text;
       },
     );

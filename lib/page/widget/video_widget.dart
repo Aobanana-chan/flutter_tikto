@@ -1,14 +1,12 @@
-import 'package:chewie/chewie.dart';
+// ignore_for_file: avoid_print
+
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_tiktok/common/application.dart';
 import 'package:flutter_tiktok/controller/main_page_scroll_controller.dart';
 import 'package:flutter_tiktok/event/stop_play_event.dart';
-import 'package:flutter_tiktok/model/comment_model.dart';
 import 'package:flutter_tiktok/model/response/feed_list_response.dart';
-import 'package:flutter_tiktok/model/video_model.dart';
 import 'package:flutter_tiktok/page/widget/video_bottom_bar_widget.dart';
-import 'package:flutter_tiktok/page/widget/video_comment_widget.dart';
 import 'package:flutter_tiktok/page/widget/video_right_bar_widget.dart';
 import 'package:flutter_tiktok/page/widget/video_share_widget.dart';
 import 'package:flutter_tiktok/util/screen_utils.dart';
@@ -16,7 +14,6 @@ import 'package:get/get.dart';
 import 'package:video_player/video_player.dart';
 
 import '../../res/colors.dart';
-import '../../util/screen_utils.dart';
 import '../../util/screen_utils.dart';
 import 'disk_widget.dart';
 import 'like_gesture_widget.dart';
@@ -28,7 +25,13 @@ class VideoWidget extends StatefulWidget {
   double contentHeight;
   Function onClickHeader;
   FeedListList video;
-  VideoWidget({Key key, bool this.showFocusButton,this.contentHeight,this.onClickHeader,this.video}) : super(key: key);
+  VideoWidget(
+      {Key key,
+      this.showFocusButton,
+      this.contentHeight,
+      this.onClickHeader,
+      this.video})
+      : super(key: key);
 
   @override
   _VideoWidgetState createState() {
@@ -44,7 +47,8 @@ class _VideoWidgetState extends State<VideoWidget> {
   @override
   void initState() {
     super.initState();
-    _videoPlayerController = VideoPlayerController.network(widget.video.content.attachments[0].url);
+    _videoPlayerController =
+        VideoPlayerController.network(widget.video.content.attachments[0].url);
     _videoPlayerController.initialize();
     _videoPlayerController.setLooping(true);
     _playOrPause();
@@ -65,27 +69,32 @@ class _VideoWidgetState extends State<VideoWidget> {
     double scale = 1;
     double videoLayoutWidth;
     double videoLayoutHeight;
-    if(_videoPlayerController.value.isInitialized){
-
-      double rateWidthHeightContent = screenWidth(context) / widget.contentHeight;
-      double rateWidthContentVideo = screenWidth(context) / _videoPlayerController.value.size.width;
-      double heightVideoByRate = _videoPlayerController.value.size.height * rateWidthContentVideo;
-      print('视频宽:${_videoPlayerController.value.size.width} 视频高:${_videoPlayerController.value.size.height}');
-      print('视频宽高比:${_videoPlayerController.value.size.width/_videoPlayerController.value.size.height}');
+    if (_videoPlayerController.value.isInitialized) {
+      double rateWidthHeightContent =
+          screenWidth(context) / widget.contentHeight;
+      double rateWidthContentVideo =
+          screenWidth(context) / _videoPlayerController.value.size.width;
+      double heightVideoByRate =
+          _videoPlayerController.value.size.height * rateWidthContentVideo;
+      print(
+          '视频宽:${_videoPlayerController.value.size.width} 视频高:${_videoPlayerController.value.size.height}');
+      print(
+          '视频宽高比:${_videoPlayerController.value.size.width / _videoPlayerController.value.size.height}');
       print('屏幕宽:${screenWidth(context)}  高：${screenHeight(context)}');
       print('内容高度:${widget.contentHeight}');
       print('内容宽高比例:$rateWidthHeightContent');
       print('比例:$rateWidthContentVideo');
       print('比例换算视频高度:$heightVideoByRate');
-      if(widget.contentHeight > heightVideoByRate ){
-        double rateHeightContentVideo = widget.contentHeight /  _videoPlayerController.value.size.height;
+      if (widget.contentHeight > heightVideoByRate) {
+        double rateHeightContentVideo =
+            widget.contentHeight / _videoPlayerController.value.size.height;
         videoLayoutHeight = heightVideoByRate;
         videoLayoutWidth = screenWidth(context);
         scale = widget.contentHeight / videoLayoutHeight;
-        print('width:$videoLayoutWidth height:$videoLayoutHeight scale:$scale rate:$rateHeightContentVideo');
+        print(
+            'width:$videoLayoutWidth height:$videoLayoutHeight scale:$scale rate:$rateHeightContentVideo');
       }
     }
-
 
     return Scaffold(
       backgroundColor: ColorRes.color_1,
@@ -95,36 +104,37 @@ class _VideoWidgetState extends State<VideoWidget> {
             onSingleTap: () {
               _playOrPause();
             },
-            child: _getVideoPlayer(videoLayoutWidth,videoLayoutHeight,scale),
+            child: _getVideoPlayer(videoLayoutWidth, videoLayoutHeight, scale),
           ),
-
           Positioned(
               right: 10,
               bottom: 110,
               child: VideoRightBarWidget(
                 video: widget.video,
                 showFocusButton: widget.showFocusButton,
-                onClickComment: (){
+                onClickComment: () {
                   showBottomComment();
                 },
-                onClickShare: (){
+                onClickShare: () {
                   showBottomShare();
                 },
-                onClickHeader: (){
+                onClickHeader: () {
                   widget.onClickHeader?.call();
                 },
               )),
           Positioned(
               right: 2,
               bottom: 20,
-              child: VinylDisk(video: widget.video,)),
+              child: VinylDisk(
+                video: widget.video,
+              )),
           Positioned(
             left: 12,
             bottom: 20,
-            child: VideoBottomBarWidget(video: widget.video,),
+            child: VideoBottomBarWidget(
+              video: widget.video,
+            ),
           )
-
-
         ],
       ),
     );
@@ -137,39 +147,35 @@ class _VideoWidgetState extends State<VideoWidget> {
     } else {
       _videoPlayerController.pause();
     }
-    setState(() {
-
-    });
+    setState(() {});
   }
 
-
-  _getVideoPlayer(double videoLayoutWidth,double videoLayoutHeight,double scale) {
-    return  Stack(
-        children: [
-          Transform.scale(
-            scale: scale,
-            alignment: Alignment.topCenter,
-            child: Container(
-                width: videoLayoutWidth,
-                height: videoLayoutHeight ,
-                child: VideoPlayer(_videoPlayerController)),
-          ),
-        _playing == true? Container() : _getPauseButton(),
-        ],
+  _getVideoPlayer(
+      double videoLayoutWidth, double videoLayoutHeight, double scale) {
+    return Stack(
+      children: [
+        Transform.scale(
+          scale: scale,
+          alignment: Alignment.topCenter,
+          child: SizedBox(
+              width: videoLayoutWidth,
+              height: videoLayoutHeight,
+              child: VideoPlayer(_videoPlayerController)),
+        ),
+        _playing == true ? Container() : _getPauseButton(),
+      ],
     );
   }
 
   _getPauseButton() {
     return Center(
-        child: Container(
+        child: SizedBox(
             width: 100,
             height: 100,
             child: Image.asset(
               'assets/images/pause.webp',
               fit: BoxFit.fill,
-            )
-        )
-    );
+            )));
   }
 
   //展示评论
@@ -192,16 +198,15 @@ class _VideoWidgetState extends State<VideoWidget> {
     showModalBottomSheet(
         context: context,
         isScrollControlled: true, //可滚动 解除showModalBottomSheet最大显示屏幕一半的限制
-        shape: RoundedRectangleBorder(borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(10),
-          topRight: Radius.circular(10),
-        ),),
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(10),
+            topRight: Radius.circular(10),
+          ),
+        ),
         backgroundColor: ColorRes.color_1,
-        builder: (context){
-          return VideoShareWidget();
+        builder: (context) {
+          return const VideoShareWidget();
         });
   }
-
-
-
 }

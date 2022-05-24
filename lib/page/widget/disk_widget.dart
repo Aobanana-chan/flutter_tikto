@@ -1,18 +1,15 @@
 import 'dart:math';
-import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_tiktok/model/response/feed_list_response.dart';
 import 'package:flutter_tiktok/util/constants.dart';
 import 'package:flutter_tiktok/util/screen_utils.dart';
 
-
 /// Rotating vinyl disk with notes go out from its bottom
 class VinylDisk extends StatefulWidget {
-  FeedListList video;
+  final FeedListList video;
 
-  VinylDisk({this.video});
+  const VinylDisk({Key key, this.video}) : super(key: key);
 
   @override
   _VinylDiskState createState() => _VinylDiskState();
@@ -41,7 +38,7 @@ class _VinylDiskState extends State<VinylDisk> with TickerProviderStateMixin {
       ],
       begin: Alignment.bottomCenter,
       end: Alignment.topLeft,
-      stops: [0.2, 0.6, 0.8, 1.0]);
+      stops: const [0.2, 0.6, 0.8, 1.0]);
 
   _drawPath({int quantity, int divider}) {
     final xOffset = screenAwareWidth(15.0, context);
@@ -85,7 +82,7 @@ class _VinylDiskState extends State<VinylDisk> with TickerProviderStateMixin {
     super.initState();
     _noteOpacityController = AnimationController(
       vsync: this,
-      duration: Duration(milliseconds: 2200),
+      duration: const Duration(milliseconds: 2200),
     );
     _noteOpacityAnimation = CurvedAnimation(
       parent: _noteOpacityController,
@@ -93,13 +90,13 @@ class _VinylDiskState extends State<VinylDisk> with TickerProviderStateMixin {
     );
 
     _noteRotationController = AnimationController(
-        duration: Duration(milliseconds: 1000 ), vsync: this);
+        duration: const Duration(milliseconds: 1000), vsync: this);
     _noteRotationTween = Tween(begin: -.05, end: .05);
     _noteRotationAnimation =
         _noteRotationTween.animate(_noteRotationController);
 
     _noteAndDiskController = AnimationController(
-        duration: Duration(milliseconds: 1000 * 2), vsync: this);
+        duration: const Duration(milliseconds: 1000 * 2), vsync: this);
     _noteAndDiskAnimation =
         Tween(begin: 0.0, end: 1.0).animate(_noteAndDiskController)
           ..addStatusListener((status) {
@@ -130,7 +127,7 @@ class _VinylDiskState extends State<VinylDisk> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     _path = _drawPath(quantity: _pathsQuantity, divider: 1);
-    return Container(
+    return SizedBox(
       width: screenAwareWidth(kVinylDiskContainerWidth, context),
       height: screenAwareHeight(kVinylDiskContainerHeight, context),
       child: Stack(children: [
@@ -143,14 +140,16 @@ class _VinylDiskState extends State<VinylDisk> with TickerProviderStateMixin {
         AnimatedBuilder(
           animation: _noteAndDiskAnimation,
           builder: (_, child) => Positioned(
-            top: _calculatePosition(_noteAndDiskAnimation.value).dy - kVinylDiskHeight / 3,
+            top: _calculatePosition(_noteAndDiskAnimation.value).dy -
+                kVinylDiskHeight / 3,
             left: _calculatePosition(_noteAndDiskAnimation.value).dx,
             child: RotationTransition(
               turns: _noteRotationAnimation,
               child: FadeTransition(
                 opacity: _noteOpacityAnimation,
                 child: Icon(Icons.music_note,
-                    color: Colors.grey[200], size: _noteAndDiskAnimation.value * 25),
+                    color: Colors.grey[200],
+                    size: _noteAndDiskAnimation.value * 25),
               ),
             ),
           ),
@@ -162,7 +161,7 @@ class _VinylDiskState extends State<VinylDisk> with TickerProviderStateMixin {
           child: RotationTransition(
             turns: _noteAndDiskAnimation,
             child: Container(
-              padding: EdgeInsets.all(12.0),
+              padding: const EdgeInsets.all(12.0),
               width: screenAwareWidth(kVinylDiskWidth, context),
               height: screenAwareHeight(kVinylDiskHeight, context),
               decoration: BoxDecoration(
@@ -173,31 +172,35 @@ class _VinylDiskState extends State<VinylDisk> with TickerProviderStateMixin {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: Colors.white,
-                  image: DecorationImage(image: NetworkImage(widget.video.user.portrait),fit: BoxFit.cover),
+                  image: DecorationImage(
+                      image: NetworkImage(widget.video.user.portrait),
+                      fit: BoxFit.cover),
                 ),
-              ),),
+              ),
             ),
           ),
+        ),
       ]),
     );
   }
+
   //网络图片
-  _getImage() {
-    return CachedNetworkImage(
-      imageBuilder: (context, imageProvider) => Container(
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: Colors.white,
-          image: DecorationImage(image: imageProvider),
-        ),
-      ),
-      fit: BoxFit.fitWidth,
-      imageUrl: 'assets/images/header_holder.jpg',
-      progressIndicatorBuilder: (context, url, downloadProgress) =>
-          CircularProgressIndicator(value: downloadProgress.progress),
-      errorWidget: (context, url, error) => Icon(Icons.error),
-    );
-  }
+  // _getImage() {
+  //   return CachedNetworkImage(
+  //     imageBuilder: (context, imageProvider) => Container(
+  //       decoration: BoxDecoration(
+  //         shape: BoxShape.circle,
+  //         color: Colors.white,
+  //         image: DecorationImage(image: imageProvider),
+  //       ),
+  //     ),
+  //     fit: BoxFit.fitWidth,
+  //     imageUrl: 'assets/images/header_holder.jpg',
+  //     progressIndicatorBuilder: (context, url, downloadProgress) =>
+  //         CircularProgressIndicator(value: downloadProgress.progress),
+  //     errorWidget: (context, url, error) => const Icon(Icons.error),
+  //   );
+  // }
 }
 
 /// Simple custom painter

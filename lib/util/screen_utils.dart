@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 /// Basically made for iPhone 12 Pro Max
 /// iPhone 12 Pro Max screen height
@@ -18,12 +17,10 @@ double screenAwareWidth(double width, BuildContext context) {
   return width / baseWidth * MediaQuery.of(context).size.width;
 }
 
-double screenWidth(BuildContext context){
+double screenWidth(BuildContext context) {
   return MediaQuery.of(context).size.width;
 }
 
-
-double screenHeight(BuildContext context){
+double screenHeight(BuildContext context) {
   return MediaQuery.of(context).size.height;
 }
-

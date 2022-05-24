@@ -1,6 +1,8 @@
-import 'dart:collection';
+// ignore_for_file: avoid_print
 
-import 'package:flutter/foundation.dart';
+import 'dart:collection';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_tiktok/common/application.dart';
@@ -18,9 +20,10 @@ import 'package:flutter_tiktok/util/camera_util.dart';
 import 'package:flutter_tiktok/util/sp_util.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+
 ///编辑用户资料
 class UserInfoEditPage extends StatefulWidget {
-  UserInfoEditPage({Key key}) : super(key: key);
+  const UserInfoEditPage({Key key}) : super(key: key);
 
   @override
   _UserInfoEditPageState createState() {
@@ -29,7 +32,6 @@ class UserInfoEditPage extends StatefulWidget {
 }
 
 class _UserInfoEditPageState extends State<UserInfoEditPage> {
-
   UserController userController = Get.put(UserController());
   UploadController uploadController = Get.put(UploadController());
 
@@ -37,15 +39,13 @@ class _UserInfoEditPageState extends State<UserInfoEditPage> {
   void initState() {
     super.initState();
     //获取用户资料
-     SPUtil.getInt(SPKeys.userUid).then((uid){
-       userController.getUserInfo(uid.toString());
-     });
-     //监听用户资料编辑
-    Application.eventBus.on<ModifyInfoEvent>().listen((event) {
-        _parseEditEvent(event);
+    SPUtil.getInt(SPKeys.userUid).then((uid) {
+      userController.getUserInfo(uid.toString());
     });
-
-
+    //监听用户资料编辑
+    Application.eventBus.on<ModifyInfoEvent>().listen((event) {
+      _parseEditEvent(event);
+    });
   }
 
   @override
@@ -64,7 +64,7 @@ class _UserInfoEditPageState extends State<UserInfoEditPage> {
   _getAppBar(BuildContext context) {
     return AppBar(
       backgroundColor: ColorRes.color_1,
-      title: Text('编辑资料'),
+      title: const Text('编辑资料'),
       elevation: 0,
       centerTitle: true,
     );
@@ -79,49 +79,95 @@ class _UserInfoEditPageState extends State<UserInfoEditPage> {
         child: Column(
           children: [
             _updateHeaderImg(context),
-            Obx(()=>ItemTurnWidget(title: '昵称',rightTitle: userController.userInfoResponse.value.nickname,onClick: (){
-              Map<String,String> map = HashMap();
-              map['title'] = '昵称';
-              map['type_edit'] = '1';
-              map['content'] = userController.userInfoResponse.value.nickname;
-              Get.toNamed(Routers.modifyUserInfo,parameters:map );
-            },),),
-            Obx(()=>ItemTurnWidget(title: '抖音号',rightTitle: userController.userInfoResponse.value.uid.toString(),onClick: (){},showArrowRight: false,),),
-            Obx(()=> ItemTurnWidget(title: '简介',rightTitle: userController.userInfoResponse.value.bio,onClick: (){
-              Map<String,String> map = HashMap();
-              map['title'] = '简介';
-              map['type_edit'] = '3';
-              map['content'] = userController.userInfoResponse.value.bio;
-              Get.toNamed(Routers.modifyUserInfo,parameters:map );
-            },),),
-            Obx(()=>ItemTurnWidget(title: '出生年月',rightTitle: userController.userInfoResponse.value.birth,onClick: (){_pickerBirth();},),),
-            Obx((){
+            Obx(
+              () => ItemTurnWidget(
+                title: '昵称',
+                rightTitle: userController.userInfoResponse.value.nickname,
+                onClick: () {
+                  Map<String, String> map = HashMap();
+                  map['title'] = '昵称';
+                  map['type_edit'] = '1';
+                  map['content'] =
+                      userController.userInfoResponse.value.nickname;
+                  Get.toNamed(Routers.modifyUserInfo, parameters: map);
+                },
+              ),
+            ),
+            Obx(
+              () => ItemTurnWidget(
+                title: '抖音号',
+                rightTitle:
+                    userController.userInfoResponse.value.uid.toString(),
+                onClick: () {},
+                showArrowRight: false,
+              ),
+            ),
+            Obx(
+              () => ItemTurnWidget(
+                title: '简介',
+                rightTitle: userController.userInfoResponse.value.bio,
+                onClick: () {
+                  Map<String, String> map = HashMap();
+                  map['title'] = '简介';
+                  map['type_edit'] = '3';
+                  map['content'] = userController.userInfoResponse.value.bio;
+                  Get.toNamed(Routers.modifyUserInfo, parameters: map);
+                },
+              ),
+            ),
+            Obx(
+              () => ItemTurnWidget(
+                title: '出生年月',
+                rightTitle: userController.userInfoResponse.value.birth,
+                onClick: () {
+                  _pickerBirth();
+                },
+              ),
+            ),
+            Obx(() {
               int genderInt = userController.userInfoResponse.value.gender;
               String genderStr = '未设置';
-              if(genderInt == 1){
-                genderStr='女';
-              }else if(genderInt == 2){
+              if (genderInt == 1) {
+                genderStr = '女';
+              } else if (genderInt == 2) {
                 genderStr = '男';
-              }else{
+              } else {}
 
-              }
-
-              return ItemTurnWidget(title: '性别',rightTitle: genderStr,onClick: (){_showPickerGender(genderInt);},);
+              return ItemTurnWidget(
+                title: '性别',
+                rightTitle: genderStr,
+                onClick: () {
+                  _showPickerGender(genderInt);
+                },
+              );
             }),
-            Obx(()=>ItemTurnWidget(title: '所在城市',rightTitle: userController.userInfoResponse.value.city,onClick: (){
-              Map<String,String> map = HashMap();
-              map['title'] = '所在城市';
-              map['type_edit'] = '6';
-              map['content'] = userController.userInfoResponse.value.city;
-              Get.toNamed(Routers.modifyUserInfo,parameters:map );
-            },),),
-            Obx(()=>ItemTurnWidget(title: '职业',rightTitle: userController.userInfoResponse.value.profession,onClick: (){
-              Map<String,String> map = HashMap();
-              map['title'] = '职业';
-              map['type_edit'] = '7';
-              map['content'] = userController.userInfoResponse.value.profession;
-              Get.toNamed(Routers.modifyUserInfo,parameters:map );
-            },),),
+            Obx(
+              () => ItemTurnWidget(
+                title: '所在城市',
+                rightTitle: userController.userInfoResponse.value.city,
+                onClick: () {
+                  Map<String, String> map = HashMap();
+                  map['title'] = '所在城市';
+                  map['type_edit'] = '6';
+                  map['content'] = userController.userInfoResponse.value.city;
+                  Get.toNamed(Routers.modifyUserInfo, parameters: map);
+                },
+              ),
+            ),
+            Obx(
+              () => ItemTurnWidget(
+                title: '职业',
+                rightTitle: userController.userInfoResponse.value.profession,
+                onClick: () {
+                  Map<String, String> map = HashMap();
+                  map['title'] = '职业';
+                  map['type_edit'] = '7';
+                  map['content'] =
+                      userController.userInfoResponse.value.profession;
+                  Get.toNamed(Routers.modifyUserInfo, parameters: map);
+                },
+              ),
+            ),
           ],
         ),
       ),
@@ -130,43 +176,55 @@ class _UserInfoEditPageState extends State<UserInfoEditPage> {
 
   _updateHeaderImg(BuildContext context) {
     double sizeHeader = 90;
-    return Container(
+    return SizedBox(
       width: Get.width,
       height: 150,
       child: InkWell(
-        onTap: (){
+        onTap: () {
           _showImgPickerAction();
         },
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Obx(()=> Container(
-              width: sizeHeader,
-              height: sizeHeader,
-              decoration: BoxDecoration(
-                  borderRadius:BorderRadius.circular(sizeHeader/2),
-                  image: DecorationImage(
-                    fit: BoxFit.cover,
-                    image: userController.userInfoResponse.value.portrait==null?
-                    AssetImage('assets/images/person_holder.png'):
-                    NetworkImage(userController.userInfoResponse.value.portrait),
-                  ),
-                  color: Colors.white
-              ),
-              child: Container(
+            Obx(
+              () => Container(
                 width: sizeHeader,
                 height: sizeHeader,
                 decoration: BoxDecoration(
-                  color: Colors.black.withAlpha(100),
-                  borderRadius:BorderRadius.circular(sizeHeader/2),
+                    borderRadius: BorderRadius.circular(sizeHeader / 2),
+                    image: DecorationImage(
+                      fit: BoxFit.cover,
+                      image: userController.userInfoResponse.value.portrait ==
+                              null
+                          ? const AssetImage('assets/images/person_holder.png')
+                          : NetworkImage(
+                              userController.userInfoResponse.value.portrait),
+                    ),
+                    color: Colors.white),
+                child: Container(
+                  width: sizeHeader,
+                  height: sizeHeader,
+                  decoration: BoxDecoration(
+                    color: Colors.black.withAlpha(100),
+                    borderRadius: BorderRadius.circular(sizeHeader / 2),
+                  ),
+                  child: const Icon(
+                    Icons.camera_alt_outlined,
+                    color: Colors.white,
+                    size: 36,
+                  ),
                 ),
-                child: Icon(Icons.camera_alt_outlined,color: Colors.white,size: 36,),
               ),
-            ),),
-           
-            SizedBox(height: 10,),
-            Text('点击更换头像',style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),)
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            const Text(
+              '点击更换头像',
+              style:
+                  TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            )
           ],
         ),
       ),
@@ -177,53 +235,55 @@ class _UserInfoEditPageState extends State<UserInfoEditPage> {
   void _showImgPickerAction() {
     showModalBottomSheet(
         context: context,
-        shape: RoundedRectangleBorder(borderRadius: const BorderRadius.only(
-        topLeft: Radius.circular(10),
-        topRight: Radius.circular(10),
-          ),),
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(10),
+            topRight: Radius.circular(10),
+          ),
+        ),
         backgroundColor: Colors.white,
-        builder: (context)=>ClickItemListWidget(
-                actionTitles: ['相机','相册'],
-                onClick: (int position){
-                  switch(position){
-                    case TypeCameraSource.camera:
-                      _uploadHeaderImg(TypeCameraSource.camera);
-                      break;
-                    case TypeCameraSource.gallery:
-                      _uploadHeaderImg(TypeCameraSource.gallery);
-                      break;
-                  }
-                  Get.back();
-                },
-     )
-    );
+        builder: (context) => ClickItemListWidget(
+              actionTitles: const ['相机', '相册'],
+              onClick: (int position) {
+                switch (position) {
+                  case TypeCameraSource.camera:
+                    _uploadHeaderImg(TypeCameraSource.camera);
+                    break;
+                  case TypeCameraSource.gallery:
+                    _uploadHeaderImg(TypeCameraSource.gallery);
+                    break;
+                }
+                Get.back();
+              },
+            ));
   }
+
   //相机/相册
-  void _uploadHeaderImg(int typeImgSource) async{
+  void _uploadHeaderImg(int typeImgSource) async {
     ImageSource imageSource;
-    if(typeImgSource == TypeCameraSource.camera){
+    if (typeImgSource == TypeCameraSource.camera) {
       imageSource = ImageSource.camera;
-    }else if(typeImgSource == TypeCameraSource.gallery){
+    } else if (typeImgSource == TypeCameraSource.gallery) {
       imageSource = ImageSource.gallery;
     }
-    var imgCamera = await ImagePicker.pickImage(source: imageSource);
+    var imgCamera = await ImagePicker().pickImage(source: imageSource);
     String imgSuffix = CameraUtil.getImgSuffix(imgCamera.path);
-    bool success = await uploadController.uploadSingleFile(imgSuffix,imgCamera);
-    if(success){
-      userController.userInfoResponse.value.portrait = uploadController.uploadResponse.tokens[0].effectUrl;
+    bool success = await uploadController.uploadSingleFile(
+        imgSuffix, File(imgCamera.path + imgCamera.name));
+    if (success) {
+      userController.userInfoResponse.value.portrait =
+          uploadController.uploadResponse.tokens[0].effectUrl;
       userController.updateUserInfo();
-    }else{
+    } else {
       EasyLoading.showToast('图片上传失败');
     }
   }
-
-
 
   ///修改个人资料：昵称、简介、城市、职业
   void _parseEditEvent(ModifyInfoEvent event) {
     print('type:${event.typeUserInfoEdit}');
     print('content:${event.content}');
-    switch(event.typeUserInfoEdit){
+    switch (event.typeUserInfoEdit) {
       case TypeUserInfoEdit.nickname:
         userController.userInfoResponse.value.nickname = event.content;
         break;
@@ -245,36 +305,37 @@ class _UserInfoEditPageState extends State<UserInfoEditPage> {
   void _showPickerGender(int genderInt) {
     showModalBottomSheet(
         context: context,
-        shape: RoundedRectangleBorder(borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(10),
-          topRight: Radius.circular(10),
-        ),),
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(10),
+            topRight: Radius.circular(10),
+          ),
+        ),
         backgroundColor: Colors.white,
-        builder: (context)=>ClickItemListWidget(
-          actionTitles: ['男','女'],
-          onClick: (int position){
-            switch(position){
-              case 0:
-                userController.userInfoResponse.value.gender = 2;
-                break;
-              case 1:
-                userController.userInfoResponse.value.gender = 1;
-                break;
-            }
-            userController.updateUserInfo();
-            Get.back();
-          },
-        )
-    );
+        builder: (context) => ClickItemListWidget(
+              actionTitles: const ['男', '女'],
+              onClick: (int position) {
+                switch (position) {
+                  case 0:
+                    userController.userInfoResponse.value.gender = 2;
+                    break;
+                  case 1:
+                    userController.userInfoResponse.value.gender = 1;
+                    break;
+                }
+                userController.updateUserInfo();
+                Get.back();
+              },
+            ));
   }
 
   //修改出生年月
   void _pickerBirth() {
     showDatePicker(
       context: context,
-      initialDate: new DateTime.now(),
-      firstDate: new DateTime.now().subtract(new Duration(days: 100000)),
-      lastDate: new DateTime.now(),
+      initialDate: DateTime.now(),
+      firstDate: DateTime.now().subtract(const Duration(days: 100000)),
+      lastDate: DateTime.now(),
     ).then((DateTime val) {
       String year = val.year.toString();
       String month = val.month.toString();
@@ -285,9 +346,5 @@ class _UserInfoEditPageState extends State<UserInfoEditPage> {
     }).catchError((err) {
       print(err);
     });
-
   }
-
-
 }
-

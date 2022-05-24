@@ -1,22 +1,21 @@
-import 'package:flutter/cupertino.dart';
+// ignore_for_file: avoid_print
+
 import 'package:flutter/material.dart';
 import 'package:flutter_tiktok/page/widget/like_gesture_widget.dart';
-import 'package:video_player/video_player.dart';
 
 class TestPage extends StatefulWidget {
-
+  const TestPage({Key key}) : super(key: key);
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<TestPage> {
-
   @override
   void initState() {
     super.initState();
-
   }
+
   @override
   void dispose() {
     super.dispose();
@@ -26,13 +25,13 @@ class _MyHomePageState extends State<TestPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('test'),
+        title: const Text('test'),
       ),
-      body:  LikeGestureWidget(
-        onAddFavorite: (){
+      body: LikeGestureWidget(
+        onAddFavorite: () {
           print('onAddFavorite');
         },
-        onSingleTap: (){
+        onSingleTap: () {
           print('onSingleTop');
         },
         child: Container(

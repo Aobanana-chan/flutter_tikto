@@ -1,32 +1,27 @@
-import 'package:flutter/foundation.dart';
+// ignore_for_file: avoid_print
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_tiktok/common/router_manager.dart';
-import 'package:flutter_tiktok/common/sp_keys.dart';
-import 'package:flutter_tiktok/controller/main_page_scroll_controller.dart';
 import 'package:flutter_tiktok/controller/user_controller.dart';
 import 'package:flutter_tiktok/controller/user_page_controller.dart';
-import 'package:flutter_tiktok/model/user_model.dart';
-import 'package:flutter_tiktok/model/video_model.dart';
-import 'package:flutter_tiktok/page/video_list_page.dart';
 import 'package:flutter_tiktok/page/widget/user_info_widget.dart';
 import 'package:flutter_tiktok/page/widget/user_item_grid_widget.dart';
 import 'package:flutter_tiktok/page/widget/user_more_bottom_sheet.dart';
 import 'package:flutter_tiktok/page/widget/user_work_list_widget.dart';
 import 'package:flutter_tiktok/res/colors.dart';
-import 'package:flutter_tiktok/util/sp_util.dart';
 import 'package:get/get.dart';
-import 'package:oktoast/oktoast.dart';
 
 class UserPage extends StatefulWidget {
-  PageController _scrollPageController;
-  bool _isLoginUser;
-  int uid;
-  UserPage({PageController pageController,bool isLoginUser,UserModel userModel,int uid}){
-    this._scrollPageController = pageController;
-    this._isLoginUser = isLoginUser;
-   this.uid = uid;
-  }
+  final PageController scrollPageController;
+  final bool isLoginUser;
+  final int uid;
+  const UserPage(
+      {Key key,
+      this.scrollPageController,
+      this.isLoginUser,
+      // UserModel userModel,
+      this.uid})
+      : super(key: key);
 
   @override
   _UserPageState createState() {
@@ -35,29 +30,28 @@ class UserPage extends StatefulWidget {
 }
 
 class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
-  MainPageScrollController _mainController = Get.find();
-  UserPageController _userPageController = Get.find();
+  final UserPageController _userPageController = Get.find();
   TabController _tabController;
-  PageController _pageController = PageController(keepPage: true);
-  ScrollController _scrollController = ScrollController();
-  UserController _userController = Get.put(UserController());
+  final PageController _pageController = PageController(keepPage: true);
+  final ScrollController _scrollController = ScrollController();
+  final UserController _userController = Get.put(UserController());
   @override
   void initState() {
     super.initState();
 
     _tabController = TabController(length: 2, vsync: this);
     _scrollController.addListener(() {
-      double position =_scrollController.offset;
+      double position = _scrollController.offset;
       bool showTitle = _userPageController.showTitle.value;
-      if(position >  145 && !showTitle){
+      if (position > 145 && !showTitle) {
         _userPageController.setShowTitle(true);
-      }else if(position <  145 && showTitle){
+      } else if (position < 145 && showTitle) {
         _userPageController.setShowTitle(false);
       }
     });
 
-    WidgetsBinding.instance.addPostFrameCallback((_bottomBarLayout) {
-      SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+    WidgetsBinding.instance.addPostFrameCallback((bottomBarLayout) {
+      SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
         statusBarIconBrightness: Brightness.dark,
       ));
@@ -76,12 +70,11 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       backgroundColor: ColorRes.color_1,
       body: CustomScrollView(
         controller: _scrollController,
-        physics: BouncingScrollPhysics(),
+        physics: const BouncingScrollPhysics(),
         slivers: [
           _getSliverAppBar(),
           _getSliverUserInfo(),
@@ -92,54 +85,66 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
     );
   }
 
-  _getSliverAppBar(){
-    return  SliverAppBar(
-      brightness:Brightness.dark,
-      backgroundColor:ColorRes.color_1,
+  _getSliverAppBar() {
+    return SliverAppBar(
+      backgroundColor: ColorRes.color_1,
       pinned: true,
       expandedHeight: 200,
-      leading: widget._isLoginUser?null:IconButton(
-        onPressed: (){
-          widget._scrollPageController.animateToPage(0, duration: Duration(milliseconds: 400), curve: Curves.linear);
-        },
-        icon: Icon(Icons.arrow_back_ios_rounded,color: Colors.white,),
-      ),
+      leading: widget.isLoginUser
+          ? null
+          : IconButton(
+              onPressed: () {
+                widget.scrollPageController.animateToPage(0,
+                    duration: const Duration(milliseconds: 400),
+                    curve: Curves.linear);
+              },
+              icon: const Icon(
+                Icons.arrow_back_ios_rounded,
+                color: Colors.white,
+              ),
+            ),
       actions: [
-         IconButton(
-           onPressed: (){
-              if( widget._isLoginUser){
-                _userPageController.toggleRightMenu();
-              }else{
-                _showMore();
-              }
-             },
-            icon: Icon( widget._isLoginUser?Icons.menu:Icons.more_horiz_rounded,color: Colors.white,),
+        IconButton(
+          onPressed: () {
+            if (widget.isLoginUser) {
+              _userPageController.toggleRightMenu();
+            } else {
+              _showMore();
+            }
+          },
+          icon: Icon(
+            widget.isLoginUser ? Icons.menu : Icons.more_horiz_rounded,
+            color: Colors.white,
+          ),
         ),
       ],
       elevation: 0,
       stretch: true,
       flexibleSpace: FlexibleSpaceBar(
-        stretchModes: [StretchMode.zoomBackground],
+        stretchModes: const [StretchMode.zoomBackground],
         collapseMode: CollapseMode.parallax,
-        title: Obx(()=> Text(_userPageController.showTitle.value?_userController.userInfoExResponse.value.user.nickname:'')),
-        centerTitle:true,
+        title: Obx(() => Text(_userPageController.showTitle.value
+            ? _userController.userInfoExResponse.value.user.nickname
+            : '')),
+        centerTitle: true,
         background: Image.asset(
           'assets/images/bg_1.jpg',
           fit: BoxFit.cover,
         ),
       ),
       // stretchTriggerOffset:145,
-      onStretchTrigger:(){
+      onStretchTrigger: () {
         print('onStretchTrigger');
         return;
-        },
+      },
+      systemOverlayStyle: SystemUiOverlayStyle.light,
     );
   }
 
   _getSliverUserInfo() {
     return SliverToBoxAdapter(
       child: UserInfoWidget(
-        isLoginUser: widget._isLoginUser,
+        isLoginUser: widget.isLoginUser,
         uid: widget.uid,
       ),
     );
@@ -150,25 +155,34 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
       pinned: true,
       delegate: StickyTabBarDelegate(
         child: PreferredSize(
-          preferredSize: Size.fromHeight(48),
+          preferredSize: const Size.fromHeight(48),
           child: Container(
             color: ColorRes.color_1,
             child: TabBar(
               controller: _tabController,
               indicatorColor: ColorRes.color_4,
-              labelStyle: TextStyle(fontSize: 15,fontWeight: FontWeight.bold,color: Colors.white),
-              unselectedLabelStyle:TextStyle(fontSize: 15,color: Colors.grey),
+              labelStyle: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white),
+              unselectedLabelStyle:
+                  const TextStyle(fontSize: 15, color: Colors.grey),
               tabs: <Widget>[
                 Tab(
-                  child: Obx(()=>Text('作品 ${_userController.userWorkList.length}'),),
+                  child: Obx(
+                    () => Text('作品 ${_userController.userWorkList.length}'),
+                  ),
                 ),
-                Tab(
-                  child: Text('喜欢 6',
+                const Tab(
+                  child: Text(
+                    '喜欢 6',
                   ),
                 ),
               ],
-              onTap: (index){
-                _pageController.animateToPage(index, duration: Duration(milliseconds: 200), curve: Curves.linear);
+              onTap: (index) {
+                _pageController.animateToPage(index,
+                    duration: const Duration(milliseconds: 200),
+                    curve: Curves.linear);
               },
             ),
           ),
@@ -183,57 +197,59 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
     double itemHeight = itemWidth / 9 * 16;
 
     return SliverToBoxAdapter(
-      child: Obx(()=>
-          ConstrainedBox(
-            constraints: BoxConstraints(
-              maxWidth: MediaQuery.of(context).size.width,
-              minWidth: MediaQuery.of(context).size.width,
-              maxHeight:itemHeight * _userController.userWorkList.length / 3,
-            ),
-            child:  PageView.builder(
-              controller: _pageController,
-              itemCount:2,
-              itemBuilder: (context,index){
-                return index == 0?UserWorkListWidget():_getPageLayout(index);
-              },
-              onPageChanged: (index){
-                _tabController.animateTo(index);
-              },
-            ),
+      child: Obx(
+        () => ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: MediaQuery.of(context).size.width,
+            minWidth: MediaQuery.of(context).size.width,
+            maxHeight: itemHeight * _userController.userWorkList.length / 3,
           ),
+          child: PageView.builder(
+            controller: _pageController,
+            itemCount: 2,
+            itemBuilder: (context, index) {
+              return index == 0
+                  ? const UserWorkListWidget()
+                  : _getPageLayout(index);
+            },
+            onPageChanged: (index) {
+              _tabController.animateTo(index);
+            },
+          ),
+        ),
       ),
     );
   }
 
   //获取PageView的每页
   Widget _getPageLayout(int index) {
-
     return Container(
       color: ColorRes.color_1,
       child: GridView.builder(
-          //处理GridView顶部空白
-          padding: EdgeInsets.zero,
-          itemCount: _userController.userWorkList.length,
-          physics: NeverScrollableScrollPhysics(),
-          shrinkWrap: true,
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        //处理GridView顶部空白
+        padding: EdgeInsets.zero,
+        itemCount: _userController.userWorkList.length,
+        physics: const NeverScrollableScrollPhysics(),
+        shrinkWrap: true,
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             //横轴元素个数
-              crossAxisCount: 3,
-              //纵轴间距
-              mainAxisSpacing: 1,
-              //横轴间距
-              crossAxisSpacing: 1,
-              //子组件宽高长度比例
-              childAspectRatio: 9/16),
-              itemBuilder: (BuildContext context, int index) {
-                return UserItemGridWidget(
-                  url: _userController.userWorkList[index].content.attachments[0].cover,
-                  onTap: (){
-                    // Navigator.push(context, MaterialPageRoute(builder: (context) => VideoListPage(videoList: _userModel.worksVideo,)));
-                  },
-                );
-              },
-          ),
+            crossAxisCount: 3,
+            //纵轴间距
+            mainAxisSpacing: 1,
+            //横轴间距
+            crossAxisSpacing: 1,
+            //子组件宽高长度比例
+            childAspectRatio: 9 / 16),
+        itemBuilder: (BuildContext context, int index) {
+          return UserItemGridWidget(
+            gifUrl: _userController
+                .userWorkList[index].content.attachments[0].cover,
+            onTap: () {
+              // Navigator.push(context, MaterialPageRoute(builder: (context) => VideoListPage(videoList: _userModel.worksVideo,)));
+            },
+          );
+        },
+      ),
     );
   }
 
@@ -241,17 +257,16 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
     showModalBottomSheet(
         context: context,
         isScrollControlled: false, //可滚动 解除showModalBottomSheet最大显示屏幕一半的限制
-        shape: RoundedRectangleBorder(borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(10),
-          topRight: Radius.circular(10),
-        ),),
-        builder: (context){
-          return UserMoreBottomSheet();
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(10),
+            topRight: Radius.circular(10),
+          ),
+        ),
+        builder: (context) {
+          return const UserMoreBottomSheet();
         });
   }
-
-
-
 }
 
 class StickyTabBarDelegate extends SliverPersistentHeaderDelegate {
@@ -260,15 +275,16 @@ class StickyTabBarDelegate extends SliverPersistentHeaderDelegate {
   StickyTabBarDelegate({@required this.child});
 
   @override
-  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return this.child;
+  Widget build(
+      BuildContext context, double shrinkOffset, bool overlapsContent) {
+    return child;
   }
 
   @override
-  double get maxExtent => this.child.preferredSize.height;
+  double get maxExtent => child.preferredSize.height;
 
   @override
-  double get minExtent => this.child.preferredSize.height;
+  double get minExtent => child.preferredSize.height;
 
   @override
   bool shouldRebuild(SliverPersistentHeaderDelegate oldDelegate) {

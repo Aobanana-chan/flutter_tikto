@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -23,24 +22,22 @@ class LikeGestureWidget extends StatefulWidget {
 }
 
 class _LikeGestureWidgetState extends State<LikeGestureWidget> {
-  GlobalKey _key = GlobalKey();
+  final GlobalKey _key = GlobalKey();
   List<Offset> icons = [];
   int lastMilliSeconds = -1;
 
   @override
   Widget build(BuildContext context) {
-
     return GestureDetector(
       key: _key,
       onTapDown: (detail) {
-
         setState(() {
           int currentMilliSeconds = DateTime.now().millisecondsSinceEpoch;
           int diff = currentMilliSeconds - lastMilliSeconds;
-          if(diff < 500){
+          if (diff < 500) {
             icons.add(_convertPosition(detail.globalPosition));
             widget.onAddFavorite?.call();
-          }else{
+          } else {
             widget.onSingleTap?.call();
           }
         });
@@ -48,7 +45,6 @@ class _LikeGestureWidgetState extends State<LikeGestureWidget> {
       onTapUp: (detail) {
         lastMilliSeconds = DateTime.now().millisecondsSinceEpoch;
       },
-
       child: Stack(
         children: <Widget>[
           widget.child,
@@ -66,15 +62,17 @@ class _LikeGestureWidgetState extends State<LikeGestureWidget> {
 
   _getIconStack() {
     return Stack(
-      children: icons.map<Widget>(
+      children: icons
+          .map<Widget>(
             (position) => TikTokFavoriteAnimationIcon(
-          key: Key(position.toString()),
-          position: position,
-          onAnimationComplete: () {
-            icons.remove(position);
-          },
-        ),
-      ).toList(),
+              key: Key(position.toString()),
+              position: position,
+              onAnimationComplete: () {
+                icons.remove(position);
+              },
+            ),
+          )
+          .toList(),
     );
   }
 }
@@ -88,7 +86,7 @@ class TikTokFavoriteAnimationIcon extends StatefulWidget {
     Key key,
     this.onAnimationComplete,
     this.position,
-    this.size: 200,
+    this.size = 200,
   }) : super(key: key);
 
   @override
@@ -98,7 +96,6 @@ class TikTokFavoriteAnimationIcon extends StatefulWidget {
 
 class _TikTokFavoriteAnimationIconState
     extends State<TikTokFavoriteAnimationIcon> with TickerProviderStateMixin {
-
   AnimationController _animationController;
 
   double rotate = pi / 10.0 * (2 * Random().nextDouble() - 1);
@@ -112,7 +109,7 @@ class _TikTokFavoriteAnimationIconState
     _animationController = AnimationController(
       lowerBound: 0,
       upperBound: 1,
-      duration: Duration(milliseconds: 1000),
+      duration: const Duration(milliseconds: 1000),
       vsync: this,
     );
 
@@ -135,18 +132,16 @@ class _TikTokFavoriteAnimationIconState
     widget.onAnimationComplete?.call();
   }
 
-
   @override
   Widget build(BuildContext context) {
     return widget.position == null
         ? Container()
         : Positioned(
-            left: widget.position.dx - widget.size /2,
-            top: widget.position.dy - widget.size ,
+            left: widget.position.dx - widget.size / 2,
+            top: widget.position.dy - widget.size,
             child: _getBody(),
           );
   }
-
 
   //获取动画的值
   double get value => _animationController?.value;
@@ -160,20 +155,17 @@ class _TikTokFavoriteAnimationIconState
     }
     var res = 0.9 - (value - dismissDuration) / (1 - dismissDuration);
     return res < 0 ? 0 : res;
-
   }
 
   double get scale {
-    if(value <= 0.5){
-      return  0.6+value / 0.5 * 0.5;
-    }else if(value<=0.8){
-      return 1.1 * (1/1.1 + (1.1 -1)/1.1 * (value - 0.8) / 0.25);
-    }else {
-      return 1 + (value - 0.8)/0.2 * 0.5;
+    if (value <= 0.5) {
+      return 0.6 + value / 0.5 * 0.5;
+    } else if (value <= 0.8) {
+      return 1.1 * (1 / 1.1 + (1.1 - 1) / 1.1 * (value - 0.8) / 0.25);
+    } else {
+      return 1 + (value - 0.8) / 0.2 * 0.5;
     }
   }
-
-
 
   _getBody() {
     return Transform.rotate(
@@ -194,8 +186,8 @@ class _TikTokFavoriteAnimationIconState
       child: _getChild(),
       blendMode: BlendMode.srcATop,
       shaderCallback: (Rect bounds) => RadialGradient(
-        center: Alignment.topLeft.add(Alignment(0.5, 0.5)),
-        colors: [
+        center: Alignment.topLeft.add(const Alignment(0.5, 0.5)),
+        colors: const [
           Color(0xffEF6F6F),
           Color(0xffF03E3E),
         ],
@@ -204,6 +196,10 @@ class _TikTokFavoriteAnimationIconState
   }
 
   _getChild() {
-    return Image.asset('assets/images/red_heart.webp',width: widget.size,height: widget.size,);
+    return Image.asset(
+      'assets/images/red_heart.webp',
+      width: widget.size,
+      height: widget.size,
+    );
   }
 }

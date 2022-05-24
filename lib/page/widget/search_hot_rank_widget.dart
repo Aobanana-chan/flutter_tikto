@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_tiktok/res/colors.dart';
+
 ///搜索页：抖音热榜
 class SearchHotRankWidget extends StatefulWidget {
-  SearchHotRankWidget({Key key}) : super(key: key);
+  const SearchHotRankWidget({Key key}) : super(key: key);
 
   @override
   _SearchHotRankWidgetState createState() {
@@ -41,16 +42,19 @@ class _SearchHotRankWidgetState extends State<SearchHotRankWidget> {
     return Scaffold(
       backgroundColor: ColorRes.color_1,
       body: Container(
-        margin: EdgeInsets.only(left: 16,right: 16),
-        padding: EdgeInsets.all(10),
+        margin: const EdgeInsets.only(left: 16, right: 16),
+        padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
-          gradient: LinearGradient(colors: [Color.fromARGB(255, 31, 30, 38),Color.fromARGB(255, 52, 31, 40)]),
+          gradient: const LinearGradient(colors: [
+            Color.fromARGB(255, 31, 30, 38),
+            Color.fromARGB(255, 52, 31, 40)
+          ]),
         ),
         child: ListView.builder(
-            physics: NeverScrollableScrollPhysics(),
+            physics: const NeverScrollableScrollPhysics(),
             itemCount: hotList.length,
-            itemBuilder: (context,index){
+            itemBuilder: (context, index) {
               return _getItemLayout(index);
             }),
       ),
@@ -58,7 +62,7 @@ class _SearchHotRankWidgetState extends State<SearchHotRankWidget> {
   }
 
   Widget _getItemLayout(index) {
-    return Container(
+    return SizedBox(
       height: 40,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -66,47 +70,71 @@ class _SearchHotRankWidgetState extends State<SearchHotRankWidget> {
         children: [
           Stack(
             children: [
-              Image.asset('assets/images/tag_bg.webp',color: _getTagBagColor(index),width: 30,height: 30,),
+              Image.asset(
+                'assets/images/tag_bg.webp',
+                color: _getTagBagColor(index),
+                width: 30,
+                height: 30,
+              ),
               Positioned(
                 left: 12,
                 top: 10,
-                child: Text('${index+1}',style: TextStyle(
-                  color: _getTextColor(index),
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14
-                ),),
+                child: Text(
+                  '${index + 1}',
+                  style: TextStyle(
+                      color: _getTextColor(index),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14),
+                ),
               )
             ],
           ),
-          SizedBox(width: 5,),
-          Text(hotList[index],style: TextStyle(color: Colors.white,fontSize: 14),),
-          SizedBox(width: 2,),
-          Image.asset(index%2 == 0?'assets/images/tag_hot.webp':'assets/images/tag_recomment.webp',
+          const SizedBox(
+            width: 5,
+          ),
+          Text(
+            hotList[index],
+            style: const TextStyle(color: Colors.white, fontSize: 14),
+          ),
+          const SizedBox(
+            width: 2,
+          ),
+          Image.asset(
+            index % 2 == 0
+                ? 'assets/images/tag_hot.webp'
+                : 'assets/images/tag_recomment.webp',
             width: 18,
             height: 18,
           ),
-          Expanded(child: SizedBox()),
-          Image.asset('assets/images/hot_stroke.webp',width: 16,height: 16,color: ColorRes.color_2,),
-          Text('1666.6w',style: TextStyle(
+          const Expanded(child: SizedBox()),
+          Image.asset(
+            'assets/images/hot_stroke.webp',
+            width: 16,
+            height: 16,
             color: ColorRes.color_2,
-            fontSize: 12
-          ),)
+          ),
+          const Text(
+            '1666.6w',
+            style: TextStyle(color: ColorRes.color_2, fontSize: 12),
+          )
         ],
       ),
     );
   }
+
   //获取文字下图片的颜色
   _getTagBagColor(index) {
-    if(index == 0) return Color.fromARGB(255, 244 , 176, 22);
-    if(index == 1) return Color.fromARGB(255, 143, 140, 151);
-    if(index == 2) return Color.fromARGB(255, 201, 105, 85);
+    if (index == 0) return const Color.fromARGB(255, 244, 176, 22);
+    if (index == 1) return const Color.fromARGB(255, 143, 140, 151);
+    if (index == 2) return const Color.fromARGB(255, 201, 105, 85);
     return Colors.transparent;
   }
+
   //获取文字颜色
   _getTextColor(index) {
-    if(index == 0) return Color.fromARGB(255, 189 , 75, 13);
-    if(index == 1) return Color.fromARGB(255, 80, 79, 90);
-    if(index == 2) return Color.fromARGB(255, 177, 57, 40);
+    if (index == 0) return const Color.fromARGB(255, 189, 75, 13);
+    if (index == 1) return const Color.fromARGB(255, 80, 79, 90);
+    if (index == 2) return const Color.fromARGB(255, 177, 57, 40);
     return ColorRes.color_2;
   }
 }

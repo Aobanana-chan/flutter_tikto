@@ -1,12 +1,9 @@
-import 'dart:ui';
-
 import 'package:chewie/chewie.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
 class LivingVideoWidget extends StatefulWidget {
-  LivingVideoWidget({Key key}) : super(key: key);
+  const LivingVideoWidget({Key key}) : super(key: key);
 
   @override
   _LivingVideoWidgetState createState() {
@@ -23,8 +20,9 @@ class _LivingVideoWidgetState extends State<LivingVideoWidget> {
     initPlayer();
   }
 
-  Future<void> initPlayer() async{
-    _videoPlayerController = VideoPlayerController.asset('assets/video/living_0.mp4');
+  Future<void> initPlayer() async {
+    _videoPlayerController =
+        VideoPlayerController.asset('assets/video/living_0.mp4');
     await Future.wait([
       _videoPlayerController.initialize(),
     ]);
@@ -32,8 +30,8 @@ class _LivingVideoWidgetState extends State<LivingVideoWidget> {
       videoPlayerController: _videoPlayerController,
       autoPlay: true,
       looping: true,
-      showControlsOnInitialize:false,
-      showControls:false,
+      showControlsOnInitialize: false,
+      showControls: false,
     );
     setState(() {});
   }
@@ -62,24 +60,23 @@ class _LivingVideoWidgetState extends State<LivingVideoWidget> {
               bottom: 5,
               right: 5,
               child: InkWell(
-                onTap: (){
+                onTap: () {
                   _chewieController.enterFullScreen();
                 },
                 child: Container(
                   width: 35,
                   height: 35,
-                  padding: EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(25),
-                    color: Colors.black.withAlpha(150)
+                      borderRadius: BorderRadius.circular(25),
+                      color: Colors.black.withAlpha(150)),
+                  child: Image.asset(
+                    'assets/images/max.png',
                   ),
-                  child: Image.asset('assets/images/max.png',),
                 ),
               )),
         ],
       ),
     );
   }
-
-
 }

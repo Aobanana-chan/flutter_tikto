@@ -1,5 +1,6 @@
 import 'package:flutter_tiktok/generated/json/base/json_convert_content.dart';
-@deprecated
+
+@Deprecated("")
 class UploadResponse with JsonConvert<UploadResponse> {
-	String effectUrl;
+  String effectUrl;
 }

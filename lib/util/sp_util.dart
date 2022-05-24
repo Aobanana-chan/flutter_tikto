@@ -1,7 +1,6 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
-class SPUtil{
-
+class SPUtil {
   static set(String key, value) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     if (value is String) {
@@ -17,38 +16,35 @@ class SPUtil{
     }
   }
 
-
-  static  getInt(String key) async {
+  static getInt(String key) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     int data = prefs.getInt(key);
-    return data ?? null;
+    return data;
   }
 
-  static  getString(String key) async {
+  static getString(String key) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String data = prefs.getString(key);
-    return data ?? null;
+    return data;
   }
 
-
-  static  getDouble(String key) async {
+  static getDouble(String key) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     double data = prefs.getDouble(key);
-    return data ?? null;
+    return data;
   }
 
-  static  getBool(String key) async {
+  static getBool(String key) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     bool data = prefs.getBool(key);
-    return data ?? null;
+    return data;
   }
 
-  static  getStringList<T>(String key) async {
+  static getStringList<T>(String key) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     List data = prefs.getStringList(key);
-    return data ?? null;
+    return data;
   }
-
 
   static remove(String key) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();

@@ -1,5 +1,4 @@
 import 'package:camera/camera.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_tiktok/page/widget/shoot_bottom_widget.dart';
@@ -8,6 +7,8 @@ import 'package:flutter_tiktok/page/widget/shoot_top_widget.dart';
 
 ///拍摄页
 class ShootPage extends StatefulWidget {
+  const ShootPage({Key key}) : super(key: key);
+
   @override
   State<StatefulWidget> createState() {
     return _ShootPageState();
@@ -22,9 +23,8 @@ class _ShootPageState extends State<ShootPage> {
   void initState() {
     super.initState();
 
-
-    WidgetsBinding.instance.addPostFrameCallback((_bottomBarLayout) {
-      SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+    WidgetsBinding.instance.addPostFrameCallback((bottomBarLayout) {
+      SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
         statusBarIconBrightness: Brightness.light,
       ));
@@ -50,13 +50,14 @@ class _ShootPageState extends State<ShootPage> {
 
   @override
   Widget build(BuildContext context) {
-
-    if(null == _cameraController || !_cameraController.value.isInitialized){
-      return Center(
+    if (null == _cameraController || !_cameraController.value.isInitialized) {
+      return const Center(
         child: SizedBox(
           width: 50,
           height: 50,
-          child: CircularProgressIndicator(backgroundColor: Colors.red,),
+          child: CircularProgressIndicator(
+            backgroundColor: Colors.red,
+          ),
         ),
       );
     }
@@ -70,12 +71,12 @@ class _ShootPageState extends State<ShootPage> {
           minHeight: MediaQuery.of(context).size.height,
         ),
         child: Stack(
-            fit:StackFit.expand,
+          fit: StackFit.expand,
           children: [
             _getCameraPreview(),
-            ShootTopWidget(),
-            ShootRightWidget(),
-            Positioned(bottom:0,child: ShootBottomWidget()),
+            const ShootTopWidget(),
+            const ShootRightWidget(),
+            const Positioned(bottom: 0, child: ShootBottomWidget()),
           ],
         ),
       ),
@@ -84,15 +85,13 @@ class _ShootPageState extends State<ShootPage> {
 
   //获取相机的预览
   _getCameraPreview() {
-    double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
-    double cameraWidth = _cameraController.value.previewSize.width;
     double cameraHeight = _cameraController.value.previewSize.height;
     double scale = height / cameraHeight;
     return Transform.scale(
-        scale: scale,
-        alignment: Alignment.topCenter,
-        child:  CameraPreview(_cameraController),
+      scale: scale,
+      alignment: Alignment.topCenter,
+      child: CameraPreview(_cameraController),
     );
   }
 }
