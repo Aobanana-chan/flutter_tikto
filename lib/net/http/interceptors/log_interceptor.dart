@@ -86,7 +86,7 @@ class LogInterceptors extends Interceptor {
         }
       }
     }
-    return options;
+    return handler.next(options);
   }
 
   @override
@@ -108,7 +108,7 @@ class LogInterceptors extends Interceptor {
         _printBoxed(header: 'DioError ║ ${err.type}', text: err.message);
       }
     }
-    return err;
+    return handler.next(err);
   }
 
   @override
@@ -130,7 +130,7 @@ class LogInterceptors extends Interceptor {
       _printLine('╚');
     }
 
-    return response;
+    return handler.next(response);
   }
 
   void _printBoxed({String header, String text}) {

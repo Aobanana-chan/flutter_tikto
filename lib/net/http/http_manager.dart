@@ -1,6 +1,9 @@
 // ignore_for_file: constant_identifier_names, avoid_print
 
+import 'dart:io';
+
 import 'package:connectivity/connectivity.dart';
+import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -16,8 +19,8 @@ class HttpManager {
   final Map<String, CancelToken> _cancelTokens = {};
 
   ///默认的超时时间
-  static const int CONNECT_TIMEOUT = 30 * 1000;
-  static const int RECEIVE_TIMEOUT = 30 * 1000;
+  static const int CONNECT_TIMEOUT = 5 * 1000;
+  static const int RECEIVE_TIMEOUT = 5 * 1000;
 
   Dio _dio, _dioUpload;
 
@@ -34,13 +37,29 @@ class HttpManager {
         receiveTimeout: RECEIVE_TIMEOUT,
       );
       _dio = Dio(options);
+      // _dio = Dio();
+
+      HttpClient proxySetting(HttpClient client) {
+        client.findProxy = (uri) {
+          return "PROXY 10.0.2.2:10888";
+        };
+        //代理工具会提供一个抓包的自签名证书，会通不过证书校验，所以我们禁用证书校验
+        client.badCertificateCallback =
+            (X509Certificate cert, String host, int port) => true;
+        return null;
+      }
+
+      //设置代理
+      (_dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
+          proxySetting;
+
       //添加拦截器
       _dio.interceptors.add(HeaderInterceptor());
-      _dio.interceptors.add(LogInterceptors(
-          requestHeader: true,
-          requestBody: true,
-          responseHeader: true,
-          responseBody: true));
+      // _dio.interceptors.add(LogInterceptors(
+      //     requestHeader: true,
+      //     requestBody: true,
+      //     responseHeader: true,
+      //     responseBody: true));
     }
     //初始化操作
     if (null == _dioUpload) {
@@ -49,6 +68,19 @@ class HttpManager {
         receiveTimeout: RECEIVE_TIMEOUT,
       );
       _dioUpload = Dio(options);
+      //添加代理
+      HttpClient proxySetting(HttpClient client) {
+        client.findProxy = (uri) {
+          return "PROXY 10.0.2.2:10888";
+        };
+        //代理工具会提供一个抓包的自签名证书，会通不过证书校验，所以我们禁用证书校验
+        client.badCertificateCallback =
+            (X509Certificate cert, String host, int port) => true;
+        return null;
+      }
+
+      (_dioUpload.httpClientAdapter as DefaultHttpClientAdapter)
+          .onHttpClientCreate = proxySetting;
       //添加拦截器
       _dioUpload.interceptors.add(LogInterceptors(
           requestHeader: true,

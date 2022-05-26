@@ -5,7 +5,7 @@ import 'package:flutter_tiktok/util/sp_util.dart';
 class HeaderInterceptor implements Interceptor {
   @override
   Future onError(DioError err, ErrorInterceptorHandler handler) async {
-    return err;
+    return handler.next(err);
   }
 
   @override
@@ -24,12 +24,12 @@ class HeaderInterceptor implements Interceptor {
     if (null != token && token.isNotEmpty) {
       options.headers['Authorization'] = 'Bearer $token' ?? '';
     }
-    return options;
+    return handler.next(options);
   }
 
   @override
   Future onResponse(
       Response response, ResponseInterceptorHandler handler) async {
-    return response;
+    return handler.next(response);
   }
 }
