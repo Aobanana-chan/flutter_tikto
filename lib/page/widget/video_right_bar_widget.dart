@@ -1,5 +1,8 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tiktok/model/response/feed_list_response.dart';
+import 'package:flutter_tiktok/net/api.dart';
+import 'package:flutter_tiktok/page/widget/video_widget.dart';
 import 'package:flutter_tiktok/res/colors.dart';
 import 'package:like_button/like_button.dart';
 
@@ -26,9 +29,11 @@ class VideoRightBarWidget extends StatefulWidget {
 
 class _VideoRightBarWidgetState extends State<VideoRightBarWidget> {
   final double _widgetWidth = 50;
+  ValueNotifier<int> likeCount;
   @override
   void initState() {
     super.initState();
+    likeCount = ValueNotifier<int>(widget.video.likeCount);
   }
 
   @override
@@ -112,35 +117,64 @@ class _VideoRightBarWidgetState extends State<VideoRightBarWidget> {
 
   //获取点赞按钮
   _getLikeButton() {
-    int likeCount = widget.video.likeCount;
+    // int likeCount = widget.video.likeCount;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         LikeButton(
-            size: 40,
-            circleColor: const CircleColor(
-                start: ColorRes.color_3, end: ColorRes.color_3),
-            likeBuilder: (isLike) {
-              return isLike == true
-                  ? Image.asset('assets/images/red_heart.webp')
-                  : Image.asset(
-                      'assets/images/red_heart.webp',
-                      color: Colors.white,
-                    );
-            },
-            bubblesColor: const BubblesColor(
-              dotPrimaryColor: ColorRes.color_3,
-              dotSecondaryColor: ColorRes.color_3,
-              dotThirdColor: ColorRes.color_3,
-              dotLastColor: ColorRes.color_3,
-            )),
+          likeCount: likeCount.value,
+          isLiked: widget.video.isLike ?? false,
+          size: 40,
+          circleColor:
+              const CircleColor(start: ColorRes.color_3, end: ColorRes.color_3),
+          likeBuilder: (isLike) {
+            return isLike == true
+                ? Image.asset('assets/images/red_heart.webp')
+                : Image.asset(
+                    'assets/images/red_heart.webp',
+                    color: Colors.white,
+                  );
+          },
+          bubblesColor: const BubblesColor(
+            dotPrimaryColor: ColorRes.color_3,
+            dotSecondaryColor: ColorRes.color_3,
+            dotThirdColor: ColorRes.color_3,
+            dotLastColor: ColorRes.color_3,
+          ),
+          onTap: (isLike) async {
+            var id = widget.video.id;
+            if (isLike) {
+              await Api.likeVideo(id, 2);
+              likeCount.value--;
+            } else {
+              await Api.likeVideo(id, 1);
+              likeCount.value++;
+            }
+            return !isLike;
+          },
+          // countBuilder: (likeCnt, isLike, text) {
+          //   return Container(
+          //     margin: const EdgeInsets.only(top: 2),
+          //     child: Text(
+          //       '$likeCount',
+          //       style: const TextStyle(color: Colors.white),
+          //     ),
+          //   );
+          // },
+        ),
         const SizedBox(
           height: 2,
         ),
-        Text(
-          '$likeCount',
-          style: const TextStyle(color: Colors.white),
-        )
+        ValueListenableBuilder<int>(
+          valueListenable: likeCount,
+          builder: (BuildContext context, int value, Widget child) {
+            return Text(
+              '$value',
+              style: const TextStyle(color: Colors.white),
+            );
+          },
+        ),
       ],
     );
   }

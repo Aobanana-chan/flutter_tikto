@@ -48,7 +48,7 @@ class FeedController extends GetxController {
 
   ///获取热门推荐视频列表
   Future<bool> getHotFeedList(RefreshController refreshController) async {
-    var result = await Api.getHotFeedList(cursor, count);
+    var result = await Api.goGetHotFeedList(cursor, count);
     if (result != null) {
       hotFeedList.addAll(result.xList);
       cursor = result.cursor;
@@ -68,21 +68,23 @@ class FeedController extends GetxController {
 
   ///获取好友视频列表
   Future<bool> getFriendFeedList(RefreshController refreshController) async {
-    var result = await Api.getFriendFeedList(cursorFriend, countFriend);
-    if (result != null) {
-      friendFeedList.addAll(result.xList);
-      cursorFriend = result.cursor;
-      refreshController.loadComplete();
-      return true;
-    } else {
-      return false;
-    }
+    return true;
+    // var result = await Api.getFriendFeedList(cursorFriend, countFriend);
+    // if (result != null) {
+    //   friendFeedList.addAll(result.xList);
+    //   cursorFriend = result.cursor;
+    //   refreshController.loadComplete();
+    //   return true;
+    // } else {
+    //   return false;
+    // }
   }
 
   void refreshFriendFeedList(RefreshController refreshController) async {
-    cursorFriend = 0;
-    friendFeedList.clear();
-    await getFriendFeedList(refreshController);
-    refreshController.refreshCompleted();
+    return;
+    //   cursorFriend = 0;
+    //   friendFeedList.clear();
+    //   await getFriendFeedList(refreshController);
+    //   refreshController.refreshCompleted();
   }
 }

@@ -129,10 +129,10 @@ class _SearchPageState extends State<SearchPage> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           const SearchRecordWidget(
-            title: 'Github 钉某人',
+            title: '如何让孩子三天爱上学习',
           ),
           const SearchRecordWidget(
-            title: 'Flutter 钉某人',
+            title: '国士无双十三面听',
           ),
           const SizedBox(
             height: 20,

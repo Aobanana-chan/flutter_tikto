@@ -29,7 +29,7 @@ class UserController extends GetxController {
 
   ///登录
   void login(String account, String pwd) async {
-    var response = await Api.login(account, pwd);
+    var response = await Api.goLogin(account, pwd);
     SPUtil.set(SPKeys.userUid, response.uid);
     SPUtil.set(SPKeys.token, response.token);
 
@@ -41,7 +41,7 @@ class UserController extends GetxController {
 
   ///注册
   void register(String account, String pwd, String pwdRepeat) async {
-    var response = await Api.register(account, pwd, pwdRepeat);
+    var response = await Api.goRegister(account, pwd, pwdRepeat);
     SPUtil.set(SPKeys.userUid, response.uid);
     SPUtil.set(SPKeys.token, response.token);
     Get.offAllNamed(Routers.scroll);
@@ -57,7 +57,7 @@ class UserController extends GetxController {
 
   ///获取用户资料信息(扩展)
   void getUserInfoEx(String uid) async {
-    var response = await Api.getUserInfoEx(uid);
+    var response = await Api.goGetUserInfoEx(uid);
     userInfoExResponse.value = response;
   }
 
@@ -95,9 +95,9 @@ class UserController extends GetxController {
   }
 
   ///获取用户作品列表
-  void getUserWorkList(int uid) async {
-    var result = await Api.getUserFeedList(uid, cursor, count);
-    userWorkList.value.addAll(result.xList);
+  Future<void> getUserWorkList(int uid) async {
+    var result = await Api.goGetUserFeedList(uid, cursor, count);
+    userWorkList.addAll(result.xList);
     cursor = result.cursor;
   }
 

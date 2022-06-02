@@ -1,9 +1,17 @@
 import 'dart:collection';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:dio/dio.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:flutter_tiktok/common/sp_keys.dart';
+import 'package:flutter_tiktok/model/request/LoginModel.dart';
+import 'package:flutter_tiktok/model/request/RegisterModel.dart';
 import 'package:flutter_tiktok/model/request/follow_request.dart';
 import 'package:flutter_tiktok/model/request/publish_feed_request.dart';
+import 'package:flutter_tiktok/model/response/Feed.dart';
+import 'package:flutter_tiktok/model/response/UserInfomation.dart';
+import 'package:flutter_tiktok/model/response/UserPublishVideo.dart';
 import 'package:flutter_tiktok/model/response/feed_list_response.dart';
 import 'package:flutter_tiktok/model/response/follow_response.dart';
 import 'package:flutter_tiktok/model/response/login_response.dart';
@@ -24,6 +32,7 @@ import 'package:flutter_tiktok/model/living_commend_model.dart';
 import 'package:flutter_tiktok/net/http/http_manager.dart';
 import 'package:flutter_tiktok/net/http/http_method.dart';
 import 'package:flutter_tiktok/net/http_constant.dart';
+import 'package:flutter_tiktok/util/sp_util.dart';
 
 import '../model/comment_model.dart';
 
@@ -41,7 +50,21 @@ class Api {
     return LoginResponse().fromJson(result);
   }
 
+  static Future<LoginResponse> goLogin(String account, String pwd) async {
+    UserLogin login = UserLogin(username: account, password: pwd);
+    var result = await HttpManager.getInstance().post(
+        url: HttpConstant.login,
+        cancelTokenTag: 'login',
+        params: login.toJson());
+    if (result == null) {
+      return LoginResponse().fromJson(null);
+    }
+    return LoginResponse()
+        .fromJson({"uid": result["user_id"], "token": result["token"]});
+  }
+
   ///注册
+  @Deprecated("Old")
   static Future<LoginResponse> register(
       String account, String pwd, String pwdRepeat) async {
     Map<String, String> map = HashMap();
@@ -51,6 +74,26 @@ class Api {
     var result = await HttpManager.getInstance().post(
         url: HttpConstant.register, cancelTokenTag: 'register', data: map);
     return LoginResponse().fromJson(result);
+  }
+
+  static Future<LoginResponse> goRegister(
+      String account, String pwd, String pwdRepeat) async {
+    if (pwd != pwdRepeat) {
+      EasyLoading.showToast('密码不一致');
+      return LoginResponse().fromJson(null);
+    }
+    UserRegister registerInfomation =
+        UserRegister(username: account, password: pwd);
+    var result = await HttpManager.getInstance().post(
+        url: HttpConstant.register,
+        cancelTokenTag: 'register',
+        // data: registerInfomation.toJson(),
+        params: registerInfomation.toJson());
+    if (result == null) {
+      return LoginResponse().fromJson(null);
+    }
+    return LoginResponse()
+        .fromJson({"uid": result["user_id"], "token": result["token"]});
   }
 
   ///获取用户资料信息
@@ -63,12 +106,36 @@ class Api {
   }
 
   ///获取用户资料信息(扩展)
+  @Deprecated("Old")
   static Future<UserInfoExResponse> getUserInfoEx(String uid) async {
     var result = await HttpManager.getInstance().get(
       url: HttpConstant.userInfoEx + uid,
       cancelTokenTag: 'getUserInfoEx',
     );
     return UserInfoExResponse().fromJson(result);
+  }
+
+  static Future<UserInfoExResponse> goGetUserInfoEx(String uid) async {
+    var token = await SPUtil.getString(SPKeys.token);
+    var result = await HttpManager.getInstance().get(
+        url: HttpConstant.userInfo,
+        cancelTokenTag: 'getUserInfoEx',
+        params: {"user_id": uid, "token": token});
+    var resJson = UserInfomation.fromJson(result);
+    return UserInfoExResponse().fromJson({
+      "user": {
+        "uid": int.parse(uid),
+        "nickname": resJson.user.name,
+        "portrait": "${result['user']['avatar']}",
+        "bio": "hello World",
+        "birth": "2000-1-1",
+        "city": "南宁"
+      },
+      "followerCount": resJson.user.followerCount,
+      "followingCount": resJson.user.followCount,
+      "likeCount": 0,
+      "relation": ""
+    });
   }
 
   ///更新用户资料信息
@@ -100,6 +167,7 @@ class Api {
   }
 
   ///上传文件
+  @Deprecated("Old")
   static Future<bool> uploadSingleFile(
       File file, UploadTokenResponse tokenResponse, String fileSuffix) async {
     Stream<List<int>> listStream = file.openRead();
@@ -108,13 +176,33 @@ class Api {
     bool success = await HttpManager.getInstance().uploadFile(
       url: tokenToken.uploadUrl,
       cancelTokenTag: 'uploadFile',
-      data: listStream,
+      data: {},
       method: HttpMethod.PUT,
       options: Options(headers: {
         'Content-Type': headers.contentType,
         'Date': headers.date,
         'Authorization': headers.authorization
       }),
+    );
+    return success;
+  }
+
+  static Future<bool> goUploadSingleFile(
+      File file, UploadTokenResponse tokenResponse, String title) async {
+    // UploadTokenTokensHeaders headers = tokenResponse.tokens[0].headers;
+    // UploadTokenToken tokenToken = tokenResponse.tokens[0];
+    var success = await HttpManager.getInstance().uploadFile(
+      url: HttpConstant.uploadFile,
+      cancelTokenTag: 'uploadFile',
+      data: {
+        "title": title,
+        "token": await SPUtil.getString(SPKeys.token),
+        "data": await MultipartFile.fromFile(file.path)
+      },
+      method: HttpMethod.POST,
+      // options: Options(headers: {
+      //   'Content-Type': "multipart/form-data",
+      // }),
     );
     return success;
   }
@@ -130,6 +218,7 @@ class Api {
   }
 
   ///获取用户作品列表
+  @Deprecated("Old")
   static Future<UserWorkListResponse> getUserFeedList(
       int uid, int cursor, int count) async {
     var result = await HttpManager.getInstance().get(
@@ -139,12 +228,99 @@ class Api {
     return UserWorkListResponse().fromJson(result);
   }
 
+  static Future<UserWorkListResponse> goGetUserFeedList(
+      int uid, int cursor, int count) async {
+    var token = await SPUtil.getString(SPKeys.token);
+    var result = await HttpManager.getInstance().get(
+        url: HttpConstant.userPublish,
+        cancelTokenTag: 'getUserFeedList',
+        params: {"user_id": uid, "token": token});
+    var resJson = UserPublishVideo.fromJson(result);
+    var xList = [];
+    for (var i in resJson.videoList) {
+      xList.add({
+        "id": i.id,
+        "type": 0,
+        "isLike": i.isFavorite,
+        "content": {
+          "text": "",
+          "tag": [],
+          "attachments": [
+            {"url": i.playUrl, "cover": i.coverUrl}
+          ]
+        },
+        "location": {"南宁": 1},
+        "device": "",
+        "aclType": 0,
+        "commentType": 0,
+        "createTime": DateTime.now().millisecondsSinceEpoch,
+        "user": {
+          "uid": i.author.id,
+          "nickname": i.author.name,
+          "portrait": i.coverUrl
+        },
+        "likeCount": i.favoriteCount ?? "0",
+        "commentCount": i.commentCount,
+        "shareCount": Random().nextInt(10),
+        "viewCount": Random().nextInt(60000),
+        "isFollow": i.author.isFollow,
+      });
+    }
+    return UserWorkListResponse().fromJson({"hasMore": false, "list": xList});
+  }
+
   ///获取热门作品列表
+  @Deprecated("Old")
   static Future<FeedListResponse> getHotFeedList(int cursor, int count) async {
     var result = await HttpManager.getInstance().get(
         url: '${HttpConstant.hotFeedList}?cursor=$cursor&count=$count',
         cancelTokenTag: 'getHotFeedList');
     return FeedListResponse().fromJson(result);
+  }
+
+  static Future<FeedListResponse> goGetHotFeedList(
+      int cursor, int count) async {
+    var result = await HttpManager.getInstance().get(
+        url: HttpConstant.getFeed,
+        cancelTokenTag: 'getHotFeedList',
+        params: {"token": await SPUtil.getString(SPKeys.token)});
+    var res = Feed.fromJson(result);
+    var xList = [];
+    for (var i in res.videoList) {
+      xList.add({
+        "id": i.id,
+        "type": 0,
+        "isLike": i.isFavorite,
+        "content": {
+          "text": "",
+          "tag": [],
+          "attachments": [
+            {"url": i.playUrl, "cover": i.coverUrl}
+          ]
+        },
+        "location": {"南宁": 1},
+        "device": "",
+        "aclType": 0,
+        "commentType": 0,
+        "createTime": DateTime.now().millisecondsSinceEpoch,
+        "user": {
+          "uid": i.author.id,
+          "nickname": i.author.name,
+          "portrait": i.author.avatar
+        },
+        "likeCount": i.favoriteCount ?? "0",
+        "commentCount": i.commentCount,
+        "shareCount": Random().nextInt(10),
+        "viewCount": Random().nextInt(60000),
+        "isFollow": i.author.isFollow,
+      });
+    }
+    return FeedListResponse().fromJson({
+      "hasMore": false,
+      "cursor": 0,
+      "count": (result["video_list"] as List).length,
+      "list": xList
+    });
   }
 
   ///获取好友作品列表
@@ -163,6 +339,20 @@ class Api {
         cancelTokenTag: 'follow',
         data: request.toJson());
     return FollowResponse().fromJson(result);
+  }
+
+  static Future likeVideo(int videoId, int actionType) async {
+    var uid = (await SPUtil.getInt(SPKeys.userUid)).toString();
+    var token = await SPUtil.getString(SPKeys.token);
+    var result = await HttpManager.getInstance().post(
+        url: HttpConstant.likeVideo,
+        cancelTokenTag: "likeVideoCancelToken",
+        params: {
+          "user_id": uid,
+          "token": token,
+          "video_id": videoId,
+          "action_type": actionType
+        });
   }
 
   /// ----------------------------------本地数据--------------------------------------------------------

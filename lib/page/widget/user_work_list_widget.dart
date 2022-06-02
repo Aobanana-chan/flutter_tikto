@@ -35,7 +35,7 @@ class _UserWorkListWidgetState extends State<UserWorkListWidget> {
   }
 
   _getBody(BuildContext context) {
-    List<UserWorkListList> workList = _userController.userWorkList.value;
+    List<UserWorkListList> workList = _userController.userWorkList;
     if (null == workList || workList.isEmpty) {
       return Container();
     } else {

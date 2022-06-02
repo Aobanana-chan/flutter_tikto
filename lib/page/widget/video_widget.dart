@@ -90,10 +90,20 @@ class _VideoWidgetState extends State<VideoWidget> {
             widget.contentHeight / _videoPlayerController.value.size.height;
         videoLayoutHeight = heightVideoByRate;
         videoLayoutWidth = screenWidth(context);
-        scale = widget.contentHeight / videoLayoutHeight;
+        // scale = widget.contentHeight / videoLayoutHeight;
+        scale = screenWidth(context) / videoLayoutWidth;
         print(
             'width:$videoLayoutWidth height:$videoLayoutHeight scale:$scale rate:$rateHeightContentVideo');
       }
+    } else {
+      Function setScale;
+      setScale = () {
+        if (_videoPlayerController.value.isInitialized) {
+          setState(() {});
+          _videoPlayerController.removeListener(setScale);
+        }
+      };
+      _videoPlayerController.addListener(setScale);
     }
 
     return Scaffold(
@@ -154,13 +164,15 @@ class _VideoWidgetState extends State<VideoWidget> {
       double videoLayoutWidth, double videoLayoutHeight, double scale) {
     return Stack(
       children: [
-        Transform.scale(
-          scale: scale,
-          alignment: Alignment.topCenter,
-          child: SizedBox(
-              width: videoLayoutWidth,
-              height: videoLayoutHeight,
-              child: VideoPlayer(_videoPlayerController)),
+        Center(
+          child: Transform.scale(
+            scale: scale,
+            alignment: Alignment.topCenter,
+            child: SizedBox(
+                width: videoLayoutWidth,
+                height: videoLayoutHeight,
+                child: VideoPlayer(_videoPlayerController)),
+          ),
         ),
         _playing == true ? Container() : _getPauseButton(),
       ],

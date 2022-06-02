@@ -57,7 +57,9 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
       ));
     });
 
-    _userController.getUserWorkList(_userController.loginUserUid.value);
+    _userController
+        .getUserWorkList(_userController.loginUserUid.value)
+        .then((value) => setState(() {}));
   }
 
   @override

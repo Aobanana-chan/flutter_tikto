@@ -35,7 +35,7 @@ class _LoginPageState extends State<LoginPage> {
       cursorColor: ColorRes.color_1,
       cursorWidth: 2,
       decoration:
-          const InputDecoration(border: InputBorder.none, hintText: '请输入邮箱'),
+          const InputDecoration(border: InputBorder.none, hintText: '请输入账号'),
       onChanged: (text) {
         account = text;
       },

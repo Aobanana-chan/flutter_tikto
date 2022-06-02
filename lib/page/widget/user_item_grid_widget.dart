@@ -22,9 +22,11 @@ class _UserItemGridWidgetState extends State<UserItemGridWidget> {
       },
       child: Stack(
         children: [
-          Image.network(
-            widget.gifUrl,
-            fit: BoxFit.cover,
+          SizedBox.expand(
+            child: Image.network(
+              widget.gifUrl,
+              fit: BoxFit.cover,
+            ),
           ),
           Positioned(
             left: 2,
@@ -37,7 +39,7 @@ class _UserItemGridWidgetState extends State<UserItemGridWidget> {
                   height: 15,
                 ),
                 Text(
-                  ' ${Random().nextInt(600)}',
+                  ' ${Random().nextInt(10)}',
                   style: const TextStyle(color: Colors.white, fontSize: 12),
                 ),
               ],

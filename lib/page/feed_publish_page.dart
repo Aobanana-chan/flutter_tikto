@@ -11,6 +11,7 @@ import 'package:flutter_tiktok/util/video_util.dart';
 import 'package:get/get.dart';
 import 'package:video_player/video_player.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 
 ///发布视频页面
 class FeedPublishPage extends StatefulWidget {
@@ -152,23 +153,30 @@ class _FeedPublishPageState extends State<FeedPublishPage> {
 
             print(
                 '发布视频时长:${videoValue.duration.inSeconds}  width:${videoValue.size.width}  height:${videoValue.size.height}');
-            bool videoUpload =
-                await _uploadController.uploadSingleFile('mp4', videoFile);
-            String videoUrl =
-                _uploadController.uploadResponse.tokens[0].effectUrl;
-            print('发布视频：$videoUpload 地址:$videoUrl');
-            bool imgUpload = await _uploadController.uploadSingleFile(
-                CameraUtil.getImgSuffix(coverPath), File(coverPath));
-            String coverUrl =
-                _uploadController.uploadResponse.tokens[0].effectUrl;
-            print('发布封面图：$imgUpload 地址:$coverUrl');
-            _feedController.publishFeed(
-                _editingController.text,
-                videoUrl,
-                coverUrl,
-                videoValue.duration.inSeconds.toInt(),
-                videoValue.size.width.toInt(),
-                videoValue.size.height.toInt());
+            bool videoUpload = await _uploadController.uploadSingleFile(
+                _editingController.text, videoFile);
+            // String videoUrl =
+            //     _uploadController.uploadResponse?.tokens[0].effectUrl;
+            // print('发布视频：$videoUpload 地址:$videoUrl');
+            // bool imgUpload = await _uploadController.uploadSingleFile(
+            //     CameraUtil.getImgSuffix(coverPath), File(coverPath));
+            // String coverUrl =
+            //     _uploadController.uploadResponse?.tokens[0].effectUrl;
+            // print('发布封面图：$imgUpload 地址:$coverUrl');
+            if (videoUpload) {
+              EasyLoading.showToast('发布成功');
+              Get.back();
+            } else {
+              EasyLoading.showToast('发布失败');
+            }
+
+            // _feedController.publishFeed(
+            //     _editingController.text,
+            //     videoUrl,
+            //     coverUrl,
+            //     videoValue.duration.inSeconds.toInt(),
+            //     videoValue.size.width.toInt(),
+            //     videoValue.size.height.toInt());
           },
           child: Container(
             height: 60,

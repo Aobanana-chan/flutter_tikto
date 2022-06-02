@@ -9,7 +9,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_tiktok/net/http/interceptors/header_interceptor.dart';
 
-import 'base_response.dart';
 import '../http_constant.dart';
 import 'http_error.dart';
 import 'http_method.dart';
@@ -55,15 +54,16 @@ class HttpManager {
 
       //添加拦截器
       _dio.interceptors.add(HeaderInterceptor());
-      // _dio.interceptors.add(LogInterceptors(
-      //     requestHeader: true,
-      //     requestBody: true,
-      //     responseHeader: true,
-      //     responseBody: true));
+      _dio.interceptors.add(LogInterceptors(
+          requestHeader: true,
+          requestBody: true,
+          responseHeader: true,
+          responseBody: true));
     }
     //初始化操作
     if (null == _dioUpload) {
       BaseOptions options = BaseOptions(
+        baseUrl: HttpConstant.baseUrl,
         connectTimeout: CONNECT_TIMEOUT,
         receiveTimeout: RECEIVE_TIMEOUT,
       );
@@ -189,10 +189,10 @@ class HttpManager {
           cancelToken: cancelToken);
       EasyLoading.dismiss();
       if (null != response) {
-        if (response.data['code'] == 0) {
-          return BaseResponse.fromJson(response.data).data;
+        if (response.data['status_code'] == 0) {
+          return response.data;
         } else {
-          EasyLoading.showToast(response.data['message']);
+          EasyLoading.showToast(response.data['status_msg']);
           return null;
         }
       }
@@ -208,7 +208,7 @@ class HttpManager {
       String method,
       @required String cancelTokenTag,
       Map<String, dynamic> params,
-      data,
+      Map<String, dynamic> data,
       Options options}) async {
     //请求中loading
     EasyLoading.show();
@@ -238,11 +238,11 @@ class HttpManager {
     try {
       Response response = await _dioUpload.request(url,
           queryParameters: params,
-          data: data,
+          data: FormData.fromMap(data),
           options: options,
           cancelToken: cancelToken);
       EasyLoading.dismiss();
-      if (response.statusCode == 200) {
+      if (response.statusCode == 200 && response.data["status_code"] == 0) {
         return true;
       } else {
         return false;
